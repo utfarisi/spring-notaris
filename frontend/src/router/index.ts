@@ -8,7 +8,7 @@ import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import DocumentUpload from '../views/DocumentUpload.vue'
 import Akta from '@/views/deeds/Akta.vue'
-import Client from '@/views/Client.vue'
+import Client from '@/views/clients/Client.vue'
 import Jadwal from '@/views/Jadwal.vue'
 import Pengguna from '@/views/Pengguna.vue'
 import Pengaturan from '@/views/Pengaturan.vue'
@@ -40,9 +40,15 @@ const routes = [
       { path: '', name: 'Home', component: Home },
       {path:'documents',name:'DocumentUpload',component:DocumentUpload},
       {path:'clients',name:'klien',component:Client},
+      {path:'clients/:id',name:'clientEdit',component:()=>import('@/views/clients/ClientEdit.vue')},
+      {path:'clients/:id/show',name:'clientDetail',component:()=>import('@/views/clients/ClientDetail.vue')},
       {path:'deeds',name:'akta',component:Akta},
       {path:'deeds/create',name:'DeedCreate',component:()=>import('@/views/deeds/AktaForm.vue')},
+      {path:'deeds/:id/edit',name:'EditAktaForm',component:()=>import('@/views/deeds/EditAktaForm.vue')},
       {path:'deeds/:id',name:'DeedEdit',component:()=>import('@/views/deeds/AktaDetail.vue')},
+      {path:'appointments',name:'appointments',component:()=>import('@/views/appointments/Appointments.vue')},
+      {path:'appointments/create',name:'appointmentCreate',component:()=>import('@/views/appointments/AppointmentCreate.vue')},
+      {path:'appointments/my-appointments',name:'my-appointments',component:()=>import('@/views/appointments/MyAppointments.vue')},
       {path:'schedule',name:'jadwal',component:Jadwal},
       {path:'users',name:'pengguna',component:Pengguna},
       {path:'settings',name:'pengaturan',component:Pengaturan},

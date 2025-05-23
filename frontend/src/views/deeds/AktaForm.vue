@@ -1,8 +1,10 @@
 <template>
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow p-6 space-y-4">
+
         <h2 class="text-xl font-bold">Tambah Akta</h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
+
             <!-- Tipe Akta -->
             <div>
                 <label class="block font-medium">Tipe Akta</label>

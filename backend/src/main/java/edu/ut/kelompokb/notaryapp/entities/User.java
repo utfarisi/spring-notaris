@@ -35,15 +35,13 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    @JsonBackReference
     private Role role;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_authorities", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "authority_id"))
     private Set<Authority> authorities;
 
-    @JsonBackReference
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Customer customer;
 
     public Customer getCustomer() {

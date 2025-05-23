@@ -25,8 +25,8 @@
                     <tr v-for="(akta, index) in aktas" :key="akta.id">
                         <td class="px-4 py-2 border text-center">{{ page * size + index + 1 }}</td>
                         <td class="px-4 py-2 border">{{ akta.number }}</td>
-                        <td class="px-4 py-2 border">{{ akta.deed_type }}</td>
-                        <td class="px-4 py-2 border">{{ akta.deed_date }}</td>
+                        <td class="px-4 py-2 border">{{ akta.deedType }}</td>
+                        <td class="px-4 py-2 border">{{ akta.deedDate }}</td>
                         <td class="px-4 py-2 border text-center">
                             <RouterLink :to="`/deeds/${akta.id}`" class="text-blue-500 hover:underline">Detail
                             </RouterLink>
@@ -67,7 +67,6 @@ const totalPages = ref(1)
 const fetchDeeds = async () => {
     const res = await api.get('/deeds', {
         params: { page: page.value, size },
-        withCredentials: true,
     })
     aktas.value = res.data.content
     totalPages.value = res.data.totalPages

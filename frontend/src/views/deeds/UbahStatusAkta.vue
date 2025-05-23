@@ -1,0 +1,42 @@
+<template>
+    <form @submit.prevent="submitStatus" class="space-y-4 bg-white">
+        <select v-model="form.status" class="input w-full border ">
+            <option disabled value="">Pilih Status</option>
+            <option v-for="(label, key) in statusOptions" :key="key" :value="key">{{ label }}</option>
+        </select>
+        <textarea v-model="form.note" placeholder="Catatan..." class="textarea border rounded-md p-2 w-full" />
+        <button type="submit" class="btn btn-primary bg-blue-800 p-2 rounded-md text-white">Simpan Status</button>
+    </form>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import api from '@/libs/utils'
+
+const props = defineProps<{ deedId: number }>()
+
+const form = ref({
+    status: '',
+    note: ''
+})
+
+const statusOptions: Record<string, string> = {
+    DRAFT: 'Draft',
+    IN_PROGRESS: 'Lagi Diproses',
+    WAITING_SIGNATURE: 'Menunggu Tanda Tangan',
+    COMPLETED: 'Selesai',
+    REJECTED: 'Ditolak'
+}
+
+const submitStatus = async () => {
+    try {
+        await api.put(`/deeds/${props.deedId}/status`, form.value)
+        alert('Status berhasil diperbarui')
+        form.value.status = ''
+        form.value.note = ''
+    } catch (err) {
+        console.log(err);
+        alert('Gagal memperbarui status')
+    }
+}
+</script>

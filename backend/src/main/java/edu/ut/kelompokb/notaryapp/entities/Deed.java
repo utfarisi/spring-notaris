@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +35,7 @@ public class Deed {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    @Column(unique = true, nullable = false)
     private String number;
 
     private String deed_type;
@@ -45,7 +47,7 @@ public class Deed {
     private LocalDate deed_date;
 
     @Enumerated(EnumType.STRING)
-    private DeedStatus currentStatus = DeedStatus.DRAFT;
+    private DeedStatus deed_status = DeedStatus.DRAFT;
 
     @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeedStatusHistory> statusHistories = new ArrayList<>();
@@ -121,12 +123,12 @@ public class Deed {
         this.deed_date = deed_date;
     }
 
-    public DeedStatus getCurrentStatus() {
-        return currentStatus;
+    public DeedStatus getDeed_status() {
+        return deed_status;
     }
 
-    public void setCurrentStatus(DeedStatus currentStatus) {
-        this.currentStatus = currentStatus;
+    public void setDeed_status(DeedStatus deed_status) {
+        this.deed_status = deed_status;
     }
 
     public List<DeedStatusHistory> getStatusHistories() {
