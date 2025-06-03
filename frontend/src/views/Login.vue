@@ -1,6 +1,6 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-sm p-8 bg-white rounded shadow-md">
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg p-8 bg-white rounded shadow-md">
       <h2 class="mb-4 text-2xl font-semibold text-center">Login</h2>
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
@@ -15,8 +15,10 @@
         <button type="submit" class="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
           Login
         </button>
-        or
-        <router-link to="/register">Registrasi</router-link>
+        <span class="block text-center mt-4">
+          atau
+          <router-link to="/register" class="text-blue-600 hover:underline">Registrasi</router-link>
+        </span>
       </form>
     </div>
   </div>
@@ -43,8 +45,9 @@ const handleLogin = async () => {
       password: password.value,
     })
 
+
     // Fetch user info
-    const meRes = await api.get('/auth/me', { withCredentials: true })
+    const meRes = await api.get('/auth/me')
     authStore.user = meRes.data
 
     // Redirect ke home

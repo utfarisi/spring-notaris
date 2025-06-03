@@ -8,17 +8,19 @@ import edu.ut.kelompokb.notaryapp.entities.Appointment;
 import edu.ut.kelompokb.notaryapp.etc.AppointmentStatus;
 
 public record AppointmentResponse(
+        Long id,
         AppointmentStatus status,
         LocalDate appointmentDate,
         LocalTime appointmentTime,
         String description,
-        Integer durationMinute,
+        Long durationMinute,
         CustomerResponse customer) {
 
     public static AppointmentResponse fromEntity(Appointment appointment) {
         CustomerResponse customerResponse = CustomerResponse.fromEntity(appointment.getUser().getCustomer());
 
         return new AppointmentResponse(
+                appointment.getId(),
                 appointment.getStatus(),
                 appointment.getAppointmentDate(),
                 appointment.getAppointmentTime(),

@@ -34,10 +34,10 @@ public record DeedWithStatusHistoriesRecord(
                 deed.getId(),
                 deed.getCustomer().getId(), // Hanya mengambil ID Customer
                 deed.getNumber(),
-                deed.getDeed_type(),
+                deed.getDeedType(),
                 deed.getTitle(),
                 deed.getDescription(),
-                deed.getDeed_date(),
+                deed.getDeedDate(),
                 deed.getDeed_status(),
                 histories
         );

@@ -1,3 +1,4 @@
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\repositories\DeedDocumentRepository.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\AuthResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\DeedStatusHistory.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\exceptions\ResourceNotFoundException.java
@@ -9,10 +10,12 @@ D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notary
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\etc\AppointmentStatus.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\etc\DeedStatus.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\repositories\AuthorityRepository.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\RequiredDocumentService.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\controllers\UserController.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\RoleResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\Authority.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\NotaryAppApplication.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\DeedDocument.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\DeedWithStatusHistoriesRecord.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\repositories\AppointmentRepository.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\LoginRequest.java
@@ -25,6 +28,7 @@ D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notary
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\validator\UniqueDeedNumber.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\DeedEditRequest.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\Deed.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\deeds\DeedDocumentResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\appointments\AppointmentResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\repositories\DeedStatusHistoryRepository.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\AppointmentService.java
@@ -33,10 +37,12 @@ D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notary
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\security\JwtTokenUtil.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\Appointment.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\security\JwtAuthenticationFilter.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\controllers\DeedDocumentController.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\controllers\AuthController.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\CustomerRecord.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\Document.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\repositories\RoleRepository.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\deeds\VerificationRequest.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\configs\WebConfig.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\DeedResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\controllers\AppointmentController.java
@@ -52,10 +58,14 @@ D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notary
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\User.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\entities\Customer.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\UserService.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\DeedUserRequest.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\CustomerService.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\deeds\DeedResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\AuthRequest.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\customers\CustomerResponse.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\configs\SecurityConfig.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\exceptions\ValidationExceptionHandler.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\dto\RegisterRequest.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\controllers\AdminDashboard.java
 D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\ClientService.java
+D:\development\java\spring-notaris\backend\src\main\java\edu\ut\kelompokb\notaryapp\services\DeedDocumentService.java

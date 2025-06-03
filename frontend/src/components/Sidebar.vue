@@ -1,8 +1,7 @@
 <template>
-  <aside
-    class="bg-white border-r h-screen fixed top-0 left-0 z-40 overflow-y-auto shadow-md transition-all duration-300"
+  <aside class="bg-white border-r h-screen  transition-all duration-300 ease-in-out"
     :class="{ 'w-16': !isSidebarExpanded, 'w-64': isSidebarExpanded }">
-    <div class="p-4 font-bold text-xl border-b cursor-pointer flex items-center justify-center" @click="toggleSidebar">
+    <div class="py-4 font-bold text-xl border-b cursor-pointer flex " @click="toggleSidebar">
       <span v-show="isSidebarExpanded">📜 NotarisApp</span>
       <component :is="icons['MenuIcon']" class="w-8 h-8" v-show="!isSidebarExpanded" />
     </div>
@@ -25,19 +24,32 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import * as icons from 'lucide-vue-next'
+import { useAuthStore } from '../stores/authStore'
 
+const authStore = useAuthStore()
 const isSidebarExpanded = ref(true)
+var menuItems = reactive([]);
 
-const menuItems = [
-  { icon: 'FileText', label: 'Dokumen', path: '/documents' },
-  { icon: 'User', label: 'Klien', path: '/clients' },
-  { icon: 'Book', label: 'Akta', path: '/deeds' },
-  { icon: 'Calendar', label: 'Jadwal', path: '/appointments' },
-  { icon: 'Users', label: 'Pengguna', path: '/users' },
-  { icon: 'Settings', label: 'Pengaturan', path: '/settings' },
-]
+if (authStore.isAdmin) {
+  menuItems = [
+    { icon: 'Home', label: 'Dashboard', path: '/' },
+    { icon: 'User', label: 'Klien', path: '/clients' },
+    { icon: 'Book', label: 'Akta', path: '/deeds' },
+    { icon: 'Calendar', label: 'Jadwal', path: '/appointments' },
+    { icon: 'Users', label: 'Pengguna', path: '/users' },
+    { icon: 'Settings', label: 'Pengaturan', path: '/settings' },
+  ]
+}
+else {
+  menuItems = [
+    { icon: 'Home', label: 'Dashboard', path: '/' },
+    { icon: 'Book', label: 'Akta', path: '/deeds' },
+    { icon: 'Calendar', label: 'Jadwal Saya', path: '/appointments/my-appointments' },
+  ]
+}
+
 
 const route = useRoute()
 const isActive = (path: string) => route.path.startsWith(path)

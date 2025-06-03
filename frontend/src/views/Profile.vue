@@ -4,12 +4,28 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700">Username</label>
-            <input v-model="form.username" disabled class="mt-1 w-full border-gray-300 rounded-md shadow-sm" />
+            <input v-model="form.username" disabled class="p-2 border border-gray-200 rounded w-full" />
         </div>
 
         <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">Role</label>
-            <input :value="user.role" disabled class="mt-1 w-full border-gray-300 rounded-md shadow-sm" />
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input v-model="form.email" disabled class="p-2 border border-gray-200 rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nama Depan</label>
+            <input v-model="form.firstname" disabled class="p-2 border border-gray-200 rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700">Nama Belakang</label>
+            <input v-model="form.lastname" disabled class="p-2 border border-gray-200 rounded w-full" />
+        </div>
+
+        <div class="mb-4">
+            <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
+            <textarea v-model="form.address" cols="60" rows="6" class="px-2 py-3 border border-gray-200 rounded-xl"
+                disabled></textarea>
         </div>
 
         <hr class="my-6" />
@@ -49,7 +65,7 @@ import api from '@/libs/utils'
 
 const authStore = useAuthStore()
 const user = authStore.user!
-const form = ref({ username: user.username })
+const form = ref({ username: user.username, email: user.email, firstname: user.firstname, lastname: user.lastname, address: user.address })
 
 const password = ref({
     oldPassword: '',
@@ -68,8 +84,7 @@ const changePassword = async () => {
         error.value = 'Konfirmasi password tidak cocok.'
         return
     }
-    console.log(" password lama ", password.value.newPassword)
-    console.log(" password baru ", password.value.confirmPassword)
+
     try {
         await api.post('/auth/change-password', {
             oldPassword: password.value.oldPassword,

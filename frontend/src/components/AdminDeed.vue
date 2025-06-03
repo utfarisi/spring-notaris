@@ -1,0 +1,91 @@
+<template>
+    <div>
+        <!-- Header -->
+        <div class="flex">
+            <h1 class="text-2xl font-bold mb-4 w-4/5">Daftar Akta</h1>
+            <div class="text-center">
+                <router-link to="/deeds/create"
+                    class="bg-blue-500 px-2 py-1 rounded-xl text-white font-semibold inline-block">Tambah
+                    Akta</router-link>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class=" bg-white px-6 py-8 rounded-lg shadow-md">
+            <table class="w-full table-auto mt-5">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 border border-gray-300">No</th>
+                        <th class="px-4 py-2 border border-gray-300">Nomor Akta</th>
+                        <th class="px-4 py-2 border border-gray-300">Jenis Akta</th>
+                        <th class="px-4 py-2 border border-gray-300">Tanggal</th>
+                        <th class="px-4 py-2 border border-gray-300">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(akta, index) in aktas" :key="akta.id">
+                        <td class="px-4 py-2 border border-gray-300 text-center">{{ page * size + index + 1 }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ akta.number }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ akta.deedType }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ akta.deedDate }}</td>
+                        <td class="px-4 py-2 border border-gray-300 text-center">
+                            <RouterLink :to="`/deeds/${akta.id}`" class="text-blue-500 hover:underline">Detail
+                            </RouterLink>
+                        </td>
+                    </tr>
+                    <tr v-if="aktas.length === 0">
+                        <td colspan="5" class="text-center py-4 text-gray-500">Belum ada data akta</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="flex justify-between items-center mt-4">
+                <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="prevPage"
+                    :disabled="page === 0">
+                    &lt; Prev
+                </button>
+                <span>Halaman {{ page + 1 }} dari {{ totalPages }}</span>
+                <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="nextPage"
+                    :disabled="page + 1 >= totalPages">
+                    Next &gt;
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import api from '@/libs/utils'
+
+const aktas = ref<any[]>([])
+const page = ref(0)
+const size = 10
+const totalPages = ref(1)
+
+const fetchDeeds = async () => {
+    const res = await api.get('/deeds', {
+        params: { page: page.value, size },
+    })
+    aktas.value = res.data.content
+    totalPages.value = res.data.totalPages
+}
+
+const prevPage = () => {
+    if (page.value > 0) {
+        page.value--
+        fetchDeeds()
+    }
+}
+
+const nextPage = () => {
+    if (page.value + 1 < totalPages.value) {
+        page.value++
+        fetchDeeds()
+    }
+}
+
+onMounted(fetchDeeds)
+</script>

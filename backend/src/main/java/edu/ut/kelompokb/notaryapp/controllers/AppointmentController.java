@@ -45,16 +45,16 @@ public class AppointmentController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createAppointment(@RequestBody AppointmentRequest appointment) {
+    public ResponseEntity<?> createAppointment(@AuthenticationPrincipal CustomUserDetails user, @RequestBody AppointmentRequest appointment) {
 
         LocalTime start = appointment.appointmentTime();
         LocalTime end = start.plusMinutes(appointment.durationMinute());
 
-        List<Appointment> existingAppointments = aptSrv.findByAppointmentDate(appointment.appointmentDate());
+        List<AppointmentResponse> existingAppointments = aptSrv.findByAppointmentDate(appointment.appointmentDate());
 
         boolean conflict = existingAppointments.stream().anyMatch(existing -> {
-            LocalTime exStart = existing.getAppointmentTime();
-            LocalTime exEnd = exStart.plusMinutes(existing.getDurationMinutes());
+            LocalTime exStart = existing.appointmentTime();
+            LocalTime exEnd = exStart.plusMinutes(existing.durationMinute());
             return !start.isAfter(exEnd.minusMinutes(1)) && !end.minusMinutes(1).isBefore(exStart); // ada tumpang tindih
         });
 
@@ -62,6 +62,7 @@ public class AppointmentController {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "Waktu janji tersebut sudah dipesan. Silakan pilih waktu lain."));
         }
+        Long userId = user.getUser().getId();
 
         Appointment createdAppoiment = aptSrv.save(appointment);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -94,14 +95,14 @@ public class AppointmentController {
             current = current.plusMinutes(30); // langkah 30 menit
         }
 
-        List<Appointment> bookedSlots = aptSrv.findByAppointmentDate(date); // Ambil semua janji yang sudah ada di tanggal tersebut
+        List<AppointmentResponse> bookedSlots = aptSrv.findByAppointmentDate(date); // Ambil semua janji yang sudah ada di tanggal tersebut
 
         List<LocalTime> availableSlots = allSlots.stream()
                 .filter(slot -> {
                     LocalTime proposeEnd = slot.plusMinutes(durationMinutes);
-                    for (Appointment a : bookedSlots) {
-                        LocalTime existingStart = a.getAppointmentTime();
-                        LocalTime existingEnd = existingStart.plusMinutes(a.getDurationMinutes());
+                    for (AppointmentResponse a : bookedSlots) {
+                        LocalTime existingStart = a.appointmentTime();
+                        LocalTime existingEnd = existingStart.plusMinutes(a.durationMinute());
                         boolean overlap = !slot.isAfter(existingEnd.minusMinutes(1)) && !proposeEnd.minusMinutes(1).isBefore(existingStart);
                         if (overlap) {
                             return false;
@@ -127,6 +128,24 @@ public class AppointmentController {
         }
 
         appointment.setStatus(AppointmentStatus.REJECTED);
+        aptSrv.save(appointment);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/confirm")
+    public ResponseEntity<?> confirmAppointment(@PathVariable Long id) {
+        Optional<Appointment> optional = aptSrv.findById(id);
+        if (optional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Appointment appointment = optional.get();
+        if (appointment.getStatus() != AppointmentStatus.PENDING) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tidak bisa membatalkan janji yang sudah dikonfirmasi atau ditolak.");
+        }
+
+        appointment.setStatus(AppointmentStatus.CONFIRMED);
         aptSrv.save(appointment);
 
         return ResponseEntity.ok().build();

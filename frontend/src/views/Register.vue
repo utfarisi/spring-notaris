@@ -1,17 +1,26 @@
 <template>
-  <div class="max-w-md p-4 mx-auto">
-    <h2 class="mb-4 text-xl font-bold">Register</h2>
-    <form @submit.prevent="register">
-      <input v-model="form.username" placeholder="Username" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.password" placeholder="Password" type="password" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.email" placeholder="Email" type="email" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.nip" placeholder="NIP" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.firstname" placeholder="First Name" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.lastname" placeholder="Last Name" class="w-full p-2 mb-2 border rounded" required />
-      <input v-model="form.phone" placeholder="Phone" class="w-full p-2 mb-2 border rounded" required />
-      <textarea v-model="form.address" placeholder="Address" class="w-full p-2 mb-2 border rounded" required></textarea>
-      <button type="submit" class="px-4 py-2 text-white bg-blue-500 rounded">Register</button>
-    </form>
+  <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg p-8 bg-white rounded shadow-md">
+      <h2 class="mb-4 text-xl font-bold">Register</h2>
+      <form @submit.prevent="register">
+        <input v-model="form.username" placeholder="Pengguna" class="w-full p-2 mb-2 border rounded" required />
+        <input v-model="form.password" placeholder="Sandi" type="password" class="w-full p-2 mb-2 border rounded"
+          required />
+        <input v-model="form.email" placeholder="Email" type="email" class="w-full p-2 mb-2 border rounded" required />
+        <input v-model="form.nip" placeholder="NIK" class="w-full p-2 mb-2 border rounded" required />
+        <input v-model="form.firstname" placeholder="Nama depan" class="w-full p-2 mb-2 border rounded" required />
+        <input v-model="form.lastname" placeholder="Nama belakang" class="w-full p-2 mb-2 border rounded" />
+        <input v-model="form.phone" placeholder="Telpon" class="w-full p-2 mb-2 border rounded" required />
+        <textarea v-model="form.address" placeholder="Alamat" class="w-full p-2 mb-2 border rounded"
+          required></textarea>
+        <button type="submit"
+          class="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">Register</button>
+        <span class="block text-center mt-4">
+          kembali ke
+          <router-link to="/login" class="text-blue-600 hover:underline">Login</router-link>
+        </span>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -25,7 +34,7 @@ const router = useRouter()
 const form = ref({
   username: '',
   password: '',
-  email:'',
+  email: '',
   nip: '',
   firstname: '',
   lastname: '',
@@ -44,11 +53,4 @@ const register = async () => {
 }
 </script>
 
-<style scoped>
-.input {
-  @apply w-full  border rounded mb-2;
-}
-.btn {
-  @apply bg-blue-500 text-white px-4 py-2 rounded;
-}
-</style>
+<style scoped></style>

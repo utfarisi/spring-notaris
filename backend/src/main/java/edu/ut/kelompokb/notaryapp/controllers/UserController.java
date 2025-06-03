@@ -34,7 +34,7 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasAuthority('CREATE_USERS')")
     public ResponseEntity<?> createUser(@RequestBody RegisterRequest request) {
-        usrSrv.registerUser(request.getUsername(), request.getPassword(), request.getRole());
+        usrSrv.registerUser(request.username(), request.password(), "ADMIN");
         return ResponseEntity.ok("User created");
     }
 

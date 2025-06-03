@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-65 max-w-8xl mx-auto p-6 bg-white rounded shadow">
+    <div>
         <div class="flex gap-5">
             <h2 class="text-2xl font-semibold mb-4 w-1/3">Detail Akta</h2>
             <router-link :to="{ name: 'clientEdit', params: id }"

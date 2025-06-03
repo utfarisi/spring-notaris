@@ -1,5 +1,7 @@
 package edu.ut.kelompokb.notaryapp.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +29,11 @@ public class ClientController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return custSrv.getCustomerByUserRole("USER", pageable);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CustomerRecord>> all() {
+        return ResponseEntity.ok(custSrv.findAll());
     }
 
     @GetMapping("/{id}/show")

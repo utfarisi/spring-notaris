@@ -1,33 +1,33 @@
 <template>
-    <div class="ml-45 flex flex-col items-center h-full">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-4 w-10/12">
-            <h2 class="text-xl font-semibold">Daftar Pelanggan</h2>
+    <div>
+
+        <div class="flex justify-between  mb-4 w-10/12">
+            <h1 class="text-2xl font-bold mb-4 w-4/5">Daftar Pelanggan</h1>
         </div>
 
-        <!-- Table -->
-        <div class="w-10/12 bg-white p-6 rounded shadow-md overflow-x-auto">
-            <table class="w-full table-auto border border-gray-300">
-                <thead class="bg-gray-200">
+
+        <div class=" bg-white p-6 rounded-md shadow-md overflow-x-auto">
+            <table class="w-full table-auto border border-gray-300 mt-5">
+                <thead>
                     <tr>
-                        <th class="px-4 py-2 border">No</th>
-                        <th class="px-4 py-2 border">Nama</th>
-                        <th class="px-4 py-2 border">NIP</th>
-                        <th class="px-4 py-2 border">Email</th>
-                        <th class="px-4 py-2 border">Telpon</th>
-                        <th class="px-4 py-2 border">Alamat</th>
-                        <th class="px-4 py-2 border">Aksi</th>
+                        <th class="px-4 py-2 border border-gray-300">No</th>
+                        <th class="px-4 py-2 border border-gray-300">Nama</th>
+                        <th class="px-4 py-2 border border-gray-300">NIP</th>
+                        <th class="px-4 py-2 border border-gray-300">Email</th>
+                        <th class="px-4 py-2 border border-gray-300">Telpon</th>
+                        <th class="px-4 py-2 border border-gray-300">Alamat</th>
+                        <th class="px-4 py-2 border border-gray-300">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(c, index) in clients" :key="c.id">
-                        <td class="px-4 py-2 border text-center">{{ page * size + index + 1 }}</td>
-                        <td class="px-4 py-2 border">{{ c.fullname }}</td>
-                        <td class="px-4 py-2 border">{{ c.nip }}</td>
-                        <td class="px-4 py-2 border">{{ c.email }}</td>
-                        <td class="px-4 py-2 border">{{ c.phone }}</td>
-                        <td class="px-4 py-2 border">{{ c.address }}</td>
-                        <td class="px-4 py-2 border text-center">
+                        <td class="px-4 py-2 border border-gray-300 text-center">{{ page * size + index + 1 }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ c.fullname }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ c.nip }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ c.email }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ c.phone }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ c.address }}</td>
+                        <td class="px-4 py-2 border border-gray-300 text-center">
                             <RouterLink :to="`/clients/${c.id}/show`" class="text-blue-500 hover:underline">Detail
                             </RouterLink>
                         </td>

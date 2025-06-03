@@ -37,7 +37,7 @@ public class DocumentController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file,
             @AuthenticationPrincipal UserDetails userDetails) throws IOException {
-        System.out.println(" methode upload bisa di akses !");
+
         long maxSize = 5 * 1024 * 1024; // 5 MB
 
         if (file.isEmpty()) {

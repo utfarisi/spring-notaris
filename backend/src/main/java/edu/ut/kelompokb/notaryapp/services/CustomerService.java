@@ -1,5 +1,7 @@
 package edu.ut.kelompokb.notaryapp.services;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,13 @@ public class CustomerService {
 
     public CustomerService(CustomerRepository custRepo) {
         this.custRepo = custRepo;
+    }
+
+    public List<CustomerRecord> findAll() {
+        return custRepo.findAll().stream()
+                .map(c -> new CustomerRecord(
+                c.getId(), c.getNip(), c.getFirstName(), c.getLastName(), c.getFirstName() + " " + c.getLastName(), c.getPhone(), c.getAddress(), c.getUser().getUsername(), c.getUser().getEmail()
+        )).toList();
     }
 
     public void save(Customer customer) {

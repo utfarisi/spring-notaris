@@ -21,7 +21,7 @@ public class JwtTokenUtil {
     private String SECRET_KEY;
 
     @Value("${app.jwt.expiration-ms}")
-    private long EXPIRATION_TIME; // 10 jam
+    private long EXPIRATION_TIME;
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

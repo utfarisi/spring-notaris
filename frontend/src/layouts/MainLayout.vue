@@ -1,9 +1,8 @@
 <template>
   <div class="flex min-h-screen bg-gray-100 text-gray-900">
-    <!-- Sidebar -->
+
     <Sidebar />
 
-    <!-- Main content -->
     <div class="flex-1 flex flex-col">
       <!-- Topbar -->
       <header class="bg-white shadow px-6 py-4 flex items-center justify-between">

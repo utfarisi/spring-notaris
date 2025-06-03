@@ -14,7 +14,7 @@ public record DeedRequest(
         @NotBlank(message = "Judul akta tidak boleh kosong")
         @Size(min = 5, max = 255, message = "Judul akta harus antara 5 dan 255 karakter")
         String title,
-        @NotNull
+        @NotNull(message = "Pilih salah satu tanggal!")
         LocalDate deed_date,
         String description,
         Long customer_id

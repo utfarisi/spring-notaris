@@ -3,6 +3,7 @@ package edu.ut.kelompokb.notaryapp.dto;
 import java.time.LocalDate;
 
 import edu.ut.kelompokb.notaryapp.entities.Deed;
+import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 
 public record DeedResponse(
         Long id,
@@ -11,6 +12,7 @@ public record DeedResponse(
         String deedType,
         String title,
         String description,
+        DeedStatus deedStatus,
         LocalDate deedDate
         ) {
 
@@ -19,10 +21,11 @@ public record DeedResponse(
                 deed.getId(),
                 deed.getCustomer().getId(),
                 deed.getNumber(),
-                deed.getDeed_type(),
+                deed.getDeedType(),
                 deed.getTitle(),
                 deed.getDescription(),
-                deed.getDeed_date()
+                deed.getDeed_status(),
+                deed.getDeedDate()
         );
     }
 }

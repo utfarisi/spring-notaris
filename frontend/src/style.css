@@ -1,3 +1,11 @@
 @import "tailwindcss/preflight";
 @import "tailwindcss/utilities";
 @import "tailwindcss";
+
+.input {
+  @apply w-full border rounded mb-2 p-3;
+}
+
+.btn {
+  @apply bg-blue-500 text-white px-4 py-2 rounded border;
+}

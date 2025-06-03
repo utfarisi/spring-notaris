@@ -7,13 +7,12 @@ import { useAuthStore } from '../stores/authStore'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import MainLayout from '@/layouts/MainLayout.vue'
 import DocumentUpload from '../views/DocumentUpload.vue'
-import Akta from '@/views/deeds/Akta.vue'
 import Client from '@/views/clients/Client.vue'
 import Jadwal from '@/views/Jadwal.vue'
 import Pengguna from '@/views/Pengguna.vue'
 import Pengaturan from '@/views/Pengaturan.vue'
 import Profile from '@/views/Profile.vue'
-import { Component } from 'lucide-vue-next'
+import Deeds from '@/views/deeds/Deeds.vue'
 
 
 
@@ -39,21 +38,21 @@ const routes = [
     children: [
       { path: '', name: 'Home', component: Home },
       {path:'documents',name:'DocumentUpload',component:DocumentUpload},
-      {path:'clients',name:'klien',component:Client},
+      {path:'clients',name:'klien',component:Client, meta:{roles:['ADMIN']}},
       {path:'clients/:id',name:'clientEdit',component:()=>import('@/views/clients/ClientEdit.vue')},
-      {path:'clients/:id/show',name:'clientDetail',component:()=>import('@/views/clients/ClientDetail.vue')},
-      {path:'deeds',name:'akta',component:Akta},
+      {path:'clients/:id/show',name:'clientDetail',meta:{roles:['ADMIN']},component:()=>import('@/views/clients/ClientDetail.vue')},
+      {path:'operator/deeds/:id/review-documents',meta:{roles:['ADMIN']}, component:()=>import('@/views/deeds/DeedDocumentReview.vue')},
+      {path:'deeds',name:'akta',component:Deeds},
       {path:'deeds/create',name:'DeedCreate',component:()=>import('@/views/deeds/AktaForm.vue')},
       {path:'deeds/:id/edit',name:'EditAktaForm',component:()=>import('@/views/deeds/EditAktaForm.vue')},
-      {path:'deeds/:id',name:'DeedEdit',component:()=>import('@/views/deeds/AktaDetail.vue')},
-      {path:'appointments',name:'appointments',component:()=>import('@/views/appointments/Appointments.vue')},
-      {path:'appointments/create',name:'appointmentCreate',component:()=>import('@/views/appointments/AppointmentCreate.vue')},
-      {path:'appointments/my-appointments',name:'my-appointments',component:()=>import('@/views/appointments/MyAppointments.vue')},
+      {path:'deeds/:id',name:'DeedDetail',component:()=>import('@/views/deeds/AktaDetail.vue')},
+      {path:'appointments',name:'appointments',meta:{roles:['ADMIN']},component:()=>import('@/views/appointments/Appointments.vue')},
+      {path:'appointments/create',name:'appointmentCreate',meta:{roles:['USER']},component:()=>import('@/views/appointments/AppointmentCreate.vue')},
+      {path:'appointments/my-appointments',name:'my-appointments',meta:{roles:['USER']},component:()=>import('@/views/appointments/MyAppointments.vue')},
       {path:'schedule',name:'jadwal',component:Jadwal},
       {path:'users',name:'pengguna',component:Pengguna},
       {path:'settings',name:'pengaturan',component:Pengaturan},
       {path:'profile',name:'profile',component:Profile}
-      // Tambahkan route lain dengan meta juga jika perlu
     ]
   }
 ]
@@ -64,19 +63,22 @@ const router = createRouter({
 })
 
 // ⬇️ Tambahkan ini sebelum export
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
+
+  if (!authStore.user) {
+    await authStore.initialize()
+  }
+
   const isAuthenticated = authStore.isAuthenticated
   const userRole = authStore.user?.role
 
-  // Cek apakah butuh login
   if (to.meta.authRequired && !isAuthenticated) {
     return next({ name: 'Login' })
   }
 
-  // Cek apakah peran pengguna sesuai
   if (to.meta.roles && !to.meta.roles.includes(userRole)) {
-    return next({ name: 'Home' }) // Atau ke halaman lain seperti Unauthorized
+    return next({ name: 'Home' })
   }
 
   next()

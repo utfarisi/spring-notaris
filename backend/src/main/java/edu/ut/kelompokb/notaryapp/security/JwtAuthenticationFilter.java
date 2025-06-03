@@ -36,27 +36,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        try {
+            final String jwt = extractJwtFromRequest(request);
 
-        final String jwt = extractJwtFromRequest(request);
+            if (jwt != null) {
 
-        if (jwt != null) {
+                final String username = jwtTokenUtil.extractUsername(jwt);
 
-            final String username = jwtTokenUtil.extractUsername(jwt);
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    if (jwtTokenUtil.validateToken(jwt, userDetails.getUsername())) {
+                        UsernamePasswordAuthenticationToken authToken
+                                = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                if (jwtTokenUtil.validateToken(jwt, userDetails.getUsername())) {
-                    UsernamePasswordAuthenticationToken authToken
-                            = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+
+            filterChain.doFilter(request, response);
+        } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token expired\"}");
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized\"}");
         }
 
-        filterChain.doFilter(request, response);
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {

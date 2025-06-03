@@ -53,6 +53,8 @@
 
             <!-- Tombol Submit -->
             <div class="text-right">
+                <router-link :to="{ name: 'DeedDetail', params: route.params.id }"
+                    class="px-4 py-2 rounded m-2 bg-black text-white">Kembali</router-link>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
             </div>
         </form>

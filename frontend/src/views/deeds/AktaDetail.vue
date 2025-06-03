@@ -1,13 +1,23 @@
 <template>
-    <div class="ml-65 max-w-8xl mx-auto p-6 bg-white rounded shadow">
+    <div>
 
-        <div class="flex gap-5">
-            <h2 class="text-2xl font-semibold mb-4 w-1/3">Detail Akta</h2>
-            <router-link :to="{ name: 'EditAktaForm', params: route.params.id }"
-                class="bg-blue-400 p-2 rounded-md text-white">Edit</router-link>
+        <div class="flex gap-3 items-center mb-4">
+            <h2 class="text-2xl font-semibold w-10/12">Detail Akta</h2>
+
+            <router-link v-if="deed?.deedStatus === 'DRAFT' && authStore.isUser"
+                :to="{ name: 'EditAktaForm', params: route.params.id }"
+                class="bg-blue-400 px-4 py-2 rounded-md text-white text-sm">
+                Edit
+            </router-link>
+
+            <router-link v-if="authStore.isAdmin" :to="`/operator/deeds/${route.params.id}/review-documents`"
+                class="bg-green-500 px-4 py-2 rounded-md text-white text-sm">
+                Verifikasi Dokumen
+            </router-link>
         </div>
 
-        <div class="gap-8 flex">
+
+        <div class="gap-8 flex bg-white px-6 py-4 rounded-lg">
             <div class="w-2/3 border-e-2 border-gray-300  ">
                 <div v-if="deed" class="mb-6">
                     <div class="grid grid-cols-[auto_auto_1fr] gap-y-3 gap-x-2">
@@ -33,11 +43,13 @@
 
                         <p class="font-semibold text-left">Status Saat Ini</p>
                         <p>:</p>
-                        <p>{{ deed.deedStatus }}</p>
+                        <p class="px-2 py-1 bg-green-800 rounded-md max-w-min text-white font-bold text-xs">
+                            {{ deed.deedStatus }}
+                        </p>
                     </div>
                 </div>
 
-                <div class="pr-6">
+                <div class="px-4 py-2 border border-1 border-gray-200 mr-3" v-if="authStore.isAdmin">
                     <h3 class="text-lg font-semibold mb-2">Perbarui Status</h3>
 
                     <div class="flex flex-wrap items-center gap-3 mb-4">
@@ -50,7 +62,7 @@
                     </div>
 
                     <textarea v-model="note" placeholder="Catatan perubahan status"
-                        class="w-full border p-2 mb-2 rounded"></textarea>
+                        class="w-full border p-1 mb-2 rounded"></textarea>
 
                     <button @click="submitStatus" class="bg-green-600 text-white px-4 py-2 rounded">
                         Simpan Perubahan Status
@@ -86,9 +98,12 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/libs/utils'
+import { useAuthStore } from '@/stores/authStore'
+
+const authStore = useAuthStore()
 
 const route = useRoute()
 const deed = ref<any>(null)
@@ -96,9 +111,20 @@ const selectedStatus = ref('')
 const note = ref('')
 const statusSteps = ['DRAFT', 'IN_PROGRESS', 'WAITING_SIGNATURE', 'COMPLETED', 'REJECTED']
 
+const documents = ref<any[]>([])
+
+const allDocumentsApproved = computed(() => {
+    documents.value.length > 0 && documents.value.every(doc => doc.status === 'APPROVED')
+})
+
 const fetchDetail = async () => {
-    const res = await api.get(`/deeds/${route.params.id}/status-history`)
-    deed.value = res.data
+    const [detailRes, docRes] = await Promise.all([
+        api.get(`/deeds/${route.params.id}/status-history`),
+        api.get(`/deeds/${route.params.id}/documents`)
+    ])
+
+    deed.value = detailRes.data
+    documents.value = docRes.data
     selectedStatus.value = deed.value.current_status
 }
 
@@ -106,9 +132,16 @@ const selectStatus = (status: string) => {
     selectedStatus.value = status
 }
 
+const backButton = () => {
+
+}
 
 const submitStatus = async () => {
     if (!selectedStatus.value) return alert('Pilih status terlebih dahulu')
+
+    // if (!allDocumentsApproved.value) {
+    //     return alert('Semua dokumen harus disetujui sebelum mengubah status.')
+    // }
 
     await api.put(`/deeds/${route.params.id}/status`, {
         status: selectedStatus.value,

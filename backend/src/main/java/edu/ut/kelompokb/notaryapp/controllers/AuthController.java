@@ -27,6 +27,7 @@ import edu.ut.kelompokb.notaryapp.services.CustomerService;
 import edu.ut.kelompokb.notaryapp.services.JwtService;
 import edu.ut.kelompokb.notaryapp.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -46,20 +47,20 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (userService.findByUsername(request.getUsername()).isPresent()) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        if (userService.findByUsername(request.username()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already taken");
         }
 
-        User user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword());
+        User user = userService.registerUser(request.username(), request.email(), request.password());
 
         Customer customer = new Customer();
         customer.setUser(user);
-        customer.setNip(request.getNip());
-        customer.setFirstName(request.getFirstname());
-        customer.setLastName(request.getLastname());
-        customer.setPhone(request.getPhone());
-        customer.setAddress(request.getAddress());
+        customer.setNip(request.nip());
+        customer.setFirstName(request.firstname());
+        customer.setLastName(request.lastname());
+        customer.setPhone(request.phone());
+        customer.setAddress(request.address());
         customerService.save(customer);
 
         return ResponseEntity.ok("User registered successfully");
@@ -107,12 +108,31 @@ public class AuthController {
                 .map(auth -> auth.getAuthority())
                 .toList();
 
-        return ResponseEntity.ok(new UserResponse(
-                currentUser.getId(),
-                currentUser.getUsername(),
-                currentUser.getRole().getName(),
-                authorities
-        ));
+        if (currentUser.getRole().getName().equals("USER")) {
+            return ResponseEntity.ok(new UserResponse(
+                    currentUser.getId(),
+                    currentUser.getUsername(),
+                    currentUser.getRole().getName(),
+                    authorities,
+                    currentUser.getEmail(),
+                    currentUser.getCustomer().getId(),
+                    currentUser.getCustomer().getFirstName(),
+                    currentUser.getCustomer().getLastName(),
+                    currentUser.getCustomer().getAddress()
+            ));
+        } else {
+            return ResponseEntity.ok(new UserResponse(
+                    currentUser.getId(),
+                    currentUser.getUsername(),
+                    currentUser.getRole().getName(),
+                    authorities,
+                    "",
+                    null,
+                    "",
+                    "",
+                    ""
+            ));
+        }
     }
 
     @PostMapping("/logout")
@@ -142,13 +162,32 @@ public class AuthController {
         }
 
         var user = userOpt.get();
+        if (user.getRole().equals("USER")) {
+            return ResponseEntity.ok(new UserResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getRole().getName(),
+                    userDetails.getAuthorities().stream().map(auth -> auth.getAuthority()).toList(),
+                    user.getEmail(),
+                    user.getCustomer().getId(),
+                    user.getCustomer().getFirstName(),
+                    user.getCustomer().getLastName(),
+                    user.getCustomer().getAddress()
+            ));
+        } else {
+            return ResponseEntity.ok(new UserResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getRole().getName(),
+                    userDetails.getAuthorities().stream().map(auth -> auth.getAuthority()).toList(),
+                    "",
+                    null,
+                    "",
+                    "",
+                    ""
+            ));
+        }
 
-        return ResponseEntity.ok(new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getRole().getName(),
-                userDetails.getAuthorities().stream().map(auth -> auth.getAuthority()).toList()
-        ));
     }
 
     @PostMapping("/change-password")
@@ -184,12 +223,23 @@ public class AuthController {
         private String username;
         private String role;
         private List<String> authorities;
+        private String email;
+        private Long customerId;
+        private String firstname;
+        private String lastname;
+        private String address;
 
-        public UserResponse(Long id, String username, String role, List<String> authorities) {
+        public UserResponse(Long id, String username, String role, List<String> authorities, String email, Long customerId, String firstname, String lastname, String address) {
             this.id = id;
             this.username = username;
             this.role = role;
             this.authorities = authorities;
+            this.email = email;
+            this.customerId = customerId;
+            this.firstname = firstname;
+            this.lastname = lastname;
+            this.address = address;
+
         }
 
         public Long getId() {
@@ -207,6 +257,27 @@ public class AuthController {
         public List<String> getAuthorities() {
             return authorities;
         }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public Long getCustomerId() {
+            return customerId;
+        }
+
+        public String getFirstname() {
+            return firstname;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public String getAddress() {
+            return address;
+        }
+
     }
 
 }

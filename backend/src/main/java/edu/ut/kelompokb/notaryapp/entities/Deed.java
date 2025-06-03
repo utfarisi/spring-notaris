@@ -35,16 +35,18 @@ public class Deed {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = true)
     private String number;
 
-    private String deed_type;
+    @Column(name = "deed_type")
+    private String deedType;
 
     private String title;
 
     private String description;
 
-    private LocalDate deed_date;
+    @Column(name = "deed_date")
+    private LocalDate deedDate;
 
     @Enumerated(EnumType.STRING)
     private DeedStatus deed_status = DeedStatus.DRAFT;
@@ -91,12 +93,12 @@ public class Deed {
         this.number = number;
     }
 
-    public String getDeed_type() {
-        return deed_type;
+    public String getDeedType() {
+        return deedType;
     }
 
-    public void setDeed_type(String deed_type) {
-        this.deed_type = deed_type;
+    public void setDeedType(String deedType) {
+        this.deedType = deedType;
     }
 
     public String getTitle() {
@@ -115,12 +117,12 @@ public class Deed {
         this.description = description;
     }
 
-    public LocalDate getDeed_date() {
-        return deed_date;
+    public LocalDate getDeedDate() {
+        return deedDate;
     }
 
-    public void setDeed_date(LocalDate deed_date) {
-        this.deed_date = deed_date;
+    public void setDeedDate(LocalDate deedDate) {
+        this.deedDate = deedDate;
     }
 
     public DeedStatus getDeed_status() {

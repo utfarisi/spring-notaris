@@ -1,8 +1,10 @@
 <template>
-    <div class="max-w-6xl mx-auto py-6">
-        <h1 class="text-2xl font-bold mb-4">Daftar Semua Janji</h1>
+    <div>
+        <div class="flex">
+            <h1 class="text-2xl font-bold mb-4">Daftar Semua Janji</h1>
+        </div>
 
-        <div class="space-y-4">
+        <div class="space-y-4" v-if="totalElement > 0">
             <div v-for="appt in appointments" :key="appt.id" class="p-4 border rounded shadow-sm bg-white">
                 <div class="flex justify-between">
                     <div>
@@ -27,6 +29,9 @@
                 </div>
             </div>
         </div>
+        <div class="bg-white p-2 font-bold text-center " v-else>
+            Belum ada janji dengan klien
+        </div>
     </div>
 </template>
 
@@ -35,11 +40,15 @@ import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 
 const appointments = ref([])
+const totalElement = ref(0);
 const isOperator = true // atau ambil dari userStore, tergantung autentikasi kamu
 
 const fetchAppointments = async () => {
     const res = await api.get('/appointments')
     appointments.value = res.data.content
+    totalElement.value = res.data.totalElements
+    console.log(" res ", res);
+    console.log(res?.totalElements);
 }
 
 const cancelAppointment = async (id: number) => {

@@ -1,24 +1,28 @@
 <template>
-    <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+    <div>
         <h2 class="text-xl font-bold mb-4">Buat Janji dengan Notaris</h2>
 
-        <div class="space-y-3">
-            <div>
+        <div class="space-y-3 bg-white rounded-md shadow p-6">
+
+            <div class="p-2 mt-5 ">
                 <label class="block font-medium">Durasi Janji (menit)</label>
-                <select v-model="form.durationMinute" class="form-select w-full">
+                <select v-model="form.durationMinute" class="border border-gray-300 rounded-lg  form-select w-full p-2">
                     <option :value="30">30 menit</option>
                     <option :value="60">1 jam</option>
                     <option :value="90">1.5 jam</option>
                 </select>
             </div>
-            <div>
+
+            <div class=" p-2">
                 <label class="block font-medium">Tanggal Janji</label>
-                <input v-model="form.appointmentDate" type="date" class="form-input w-full" />
+                <input v-model="form.appointmentDate" type="date"
+                    class="border border-gray-300 rounded-lg  form-select w-full p-2 form-input w-full" />
             </div>
 
-            <div>
+            <div class=" p-2">
                 <label class="block font-medium">Waktu Janji</label>
-                <select v-model="form.appointmentTime" class="form-select mt-1 w-full">
+                <select v-model="form.appointmentTime"
+                    class="border border-gray-300 rounded-lg  form-select w-full p-2 form-input w-full">
                     <option disabled value="">Pilih waktu</option>
                     <option v-for="time in availableTimes" :key="time" :value="time">
                         {{ time }}
@@ -27,10 +31,10 @@
             </div>
 
             <!-- Pilihan Waktu Janji -->
-            <div>
+            <div class=" p-2">
                 <label class="block font-medium mb-1">Pilih Waktu Janji</label>
 
-                <div v-if="loadingTimes" class="text-center py-4">
+                <div v-if="loadingTimes" class="border border-gray-300 text-center py-4">
                     <span
                         class="animate-spin rounded-full h-6 w-6 border-4 border-blue-400 border-t-transparent inline-block"></span>
                     <p class="text-sm text-gray-500 mt-2">Memuat waktu tersedia...</p>
@@ -52,9 +56,9 @@
             </div>
 
 
-            <div>
+            <div class=" p-2">
                 <label class="block font-medium">Keterangan</label>
-                <textarea v-model="form.description" class="form-textarea w-full border" rows="3" />
+                <textarea v-model="form.description" class="form-textarea w-full border border-gray-300" rows="3" />
             </div>
 
             <div class="text-right mt-6">
@@ -77,12 +81,13 @@ import { useAuthStore } from '@/stores/authStore'
 
 const availableTimes = ref<string[]>([])
 const loadingTimes = ref(false)
-const authStore = useAuthStore;
+const authStore = useAuthStore();
 const user = authStore.user
 
 console.log(" user id ", user?.id);
 
 const form = ref({
+    userId: user?.id,
     appointmentDate: '',
     appointmentTime: '',
     durationMinute: 30,
@@ -116,6 +121,7 @@ watch(
 
 
 const submitAppointment = async () => {
+
     if (!form.value.appointmentDate || !form.value.appointmentTime) {
         alert('Harap pilih tanggal dan waktu janji.')
         return
@@ -127,7 +133,7 @@ const submitAppointment = async () => {
 
         alert('Janji berhasil disimpan!')
         // Redirect ke halaman konfirmasi, detail, atau kosongkan form
-        form.value = { appointmentDate: '', appointmentTime: '', description: '', durationMinute: 30 }
+        form.value = { userId: user.id, appointmentDate: '', appointmentTime: '', description: '', durationMinute: 30 }
         availableTimes.value = []
     } catch (err: any) {
         if (err.response?.status === 409) {
