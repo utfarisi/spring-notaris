@@ -19,6 +19,7 @@
                         <th class="px-4 py-2 border border-gray-300">Nomor Akta</th>
                         <th class="px-4 py-2 border border-gray-300">Jenis Akta</th>
                         <th class="px-4 py-2 border border-gray-300">Tanggal</th>
+                        <th class="px-4 py-2 border border-gray-300">Status Terakhir</th>
                         <th class="px-4 py-2 border border-gray-300">Aksi</th>
                     </tr>
                 </thead>
@@ -28,6 +29,7 @@
                         <td class="px-4 py-2 border border-gray-300">{{ akta.number }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.deedType }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.deedDate }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ akta.deedStatus }}</td>
                         <td class="px-4 py-2 border border-gray-300 text-center">
                             <RouterLink :to="`/deeds/${akta.id}`" class="text-blue-500 hover:underline">Detail
                             </RouterLink>

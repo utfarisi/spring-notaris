@@ -15,7 +15,7 @@
 
         <!-- Dokumen Pending -->
         <div class="bg-white p-4 rounded shadow col-span-1">
-            <h3 class="text-sm text-gray-500">Dokumen</h3>
+            <h3 class="text-sm text-gray-500">Dokumen Akta Terbaru</h3>
             <p class="text-lg font-semibold text-yellow-600">1 dokumen belum lengkap</p>
             <a href="/dokumen" class="text-sm text-blue-600 hover:underline">Unggah Sekarang</a>
         </div>

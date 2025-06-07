@@ -49,25 +49,77 @@
                     </div>
                 </div>
 
-                <div class="px-4 py-2 border border-1 border-gray-200 mr-3" v-if="authStore.isAdmin">
-                    <h3 class="text-lg font-semibold mb-2">Perbarui Status</h3>
+                <div class="px-4 pt-4 pb-2 border border-1 border-gray-200 mr-3" v-if="authStore.isAdmin">
 
-                    <div class="flex flex-wrap items-center gap-3 mb-4">
-                        <button v-for="step in statusSteps" :key="step" @click="selectStatus(step)" :class="[
-                            'px-4 py-2 rounded',
-                            selectedStatus === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
-                        ]">
-                            {{ step }}
+
+                    <div v-if="deed?.deedStatus === statusSteps[0] && documents.length < 1">
+                        Menunggu klien menggupload dokumen
+                    </div>
+
+                    <div v-if="(deed?.deedStatus === statusSteps[0] || deed?.deedStatus === statusSteps[4]) && documents.length > 0"
+                        class="flex flex-wrap items-center gap-3 mb-4">
+
+                        <button v-for="doc in documents" :key="doc.id"
+                            class="flex items-center gap-2 px-4 py-2 rounded border border-gray-400" disabled>
+                            {{ doc.docType }}
+                            <component :is="CheckCircle" v-if="doc.status === 'APPROVED'" class="text-green-900" />
+                            <component :is="XCircle" v-else-if="doc.status === 'REJECTED'" class="text-red-800" />
+                            <component :is="FileText" v-else />
+                        </button>
+
+                        <SetDeedOnProgress :deed="deed" @saved="onProgresssSaved" />
+
+                    </div>
+
+                    <div v-else-if="deed?.number && deed?.deedStatus === statusSteps[1]">
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                            <button v-for="step in statusSteps" :key="step" @click="selectStatus(statusSteps[2])"
+                                :class="[
+                                    'px-4 py-2 rounded',
+                                    deed.deedStatus === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                                ]" disabled>
+                                {{ step }}
+                            </button>
+                        </div>
+
+                        <h3>Proses Tanda tangan</h3>
+
+                        <textarea v-model="note" placeholder="Catatan perubahan status"
+                            class="w-full border p-1 mb-2 rounded"></textarea>
+
+                        <button @click="submitStatus" class="bg-green-600 text-white px-4 py-2 rounded">
+                            Proses Tanda Tangan
                         </button>
                     </div>
 
-                    <textarea v-model="note" placeholder="Catatan perubahan status"
-                        class="w-full border p-1 mb-2 rounded"></textarea>
+                    <div v-else-if="deed?.number && deed?.deedStatus === statusSteps[2]">
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                            <button v-for="step in statusSteps" :key="step" @click="selectStatus(statusSteps[3])"
+                                :class="[
+                                    'px-4 py-2 rounded',
+                                    deed.deedStatus === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                                ]" disabled>
+                                {{ step }}
+                            </button>
+                        </div>
 
-                    <button @click="submitStatus" class="bg-green-600 text-white px-4 py-2 rounded">
-                        Simpan Perubahan Status
-                    </button>
+                        <h3>Selesaikan Proses Akta</h3>
+
+                        <textarea v-model="note" placeholder="Catatan perubahan status"
+                            class="w-full border p-1 mb-2 rounded"></textarea>
+
+                        <button @click="submitStatus" class="bg-green-600 text-white px-4 py-2 rounded">
+                            Simpan
+                        </button>
+                    </div>
+
+                    <div v-else-if="deed?.number && deed?.deedStatus === statusSteps[3]">
+                        Akta sudah selesai
+                    </div>
+
+                    <DeedNumber :deed="deed" @saved="onNumberSaved" v-else />
                 </div>
+                <DeedUserDocument v-else :documents="deed?.deedDocs" />
             </div>
 
 
@@ -98,10 +150,14 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '@/libs/utils'
 import { useAuthStore } from '@/stores/authStore'
+import DeedNumber from '@/components/DeedNumber.vue'
+import DeedUserDocument from '@/components/DeedUserDocument.vue'
+import SetDeedOnProgress from '@/components/deeds/SetDeedOnProgress.vue'
+
 
 const authStore = useAuthStore()
 
@@ -113,18 +169,18 @@ const statusSteps = ['DRAFT', 'IN_PROGRESS', 'WAITING_SIGNATURE', 'COMPLETED', '
 
 const documents = ref<any[]>([])
 
-const allDocumentsApproved = computed(() => {
-    documents.value.length > 0 && documents.value.every(doc => doc.status === 'APPROVED')
-})
+const onNumberSaved = async (newDeed: Object) => {
+    deed.value = newDeed
+}
+
+const onProgresssSaved = async (newDeed: Object) => {
+    deed.value = newDeed
+}
 
 const fetchDetail = async () => {
-    const [detailRes, docRes] = await Promise.all([
-        api.get(`/deeds/${route.params.id}/status-history`),
-        api.get(`/deeds/${route.params.id}/documents`)
-    ])
-
+    const detailRes = await api.get(`/deeds/${route.params.id}/status-history`)
     deed.value = detailRes.data
-    documents.value = docRes.data
+    documents.value = detailRes.data?.deedDocs
     selectedStatus.value = deed.value.current_status
 }
 
@@ -132,16 +188,16 @@ const selectStatus = (status: string) => {
     selectedStatus.value = status
 }
 
-const backButton = () => {
-
-}
-
 const submitStatus = async () => {
-    if (!selectedStatus.value) return alert('Pilih status terlebih dahulu')
 
-    // if (!allDocumentsApproved.value) {
-    //     return alert('Semua dokumen harus disetujui sebelum mengubah status.')
-    // }
+    let i = statusSteps.indexOf(deed.value.deedStatus);
+    if (i !== -1) {
+        i++
+        selectedStatus.value = statusSteps[i];
+    }
+
+    console.log(" selected Status ", selectedStatus.value)
+    console.log(statusSteps[i])
 
     await api.put(`/deeds/${route.params.id}/status`, {
         status: selectedStatus.value,

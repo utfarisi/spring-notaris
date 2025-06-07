@@ -15,14 +15,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.ut.kelompokb.notaryapp.dto.DeedCompleteResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedEditRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.entities.DeedDocument;
@@ -64,6 +67,11 @@ public class DeedService {
     public Page<DeedResponse> getDeeds(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return deedRepo.findAll(pageable).map(DeedResponse::fromEntity);
+    }
+
+    public Page<DeedCompleteResponse> getDeedsAndSibling(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return deedRepo.findAll(pageable).map(DeedCompleteResponse::fromEntity);
     }
 
     public DeedResponse saveDeed(DeedUserRequest request) {
@@ -114,7 +122,8 @@ public class DeedService {
         return deedRepo.findById(id);
     }
 
-    public void updateStatus(Long id, DeedStatusUpdateRequest request) {
+    @Transactional
+    public DeedWithStatusHistoriesRecord updateStatus(Long id, DeedStatusUpdateRequest request) {
         Deed deed = deedRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Akta tidak ditemukan!"));
 
@@ -125,6 +134,22 @@ public class DeedService {
         statusHistory.setStatus(request.status());
         statusHistory.setNote(request.note());
         statusHistoryRepo.save(statusHistory);
+
+        return DeedWithStatusHistoriesRecord.fromDeed(deed);
+    }
+
+    @Transactional
+    public DeedWithStatusHistoriesRecord updateNumber(Long id, String number) {
+        Deed deed = deedRepo.findById(id).orElseThrow(() -> new RuntimeException("Akta tidak ditemukan!"));
+        deed.setNumber(number);
+        deed.setDeed_status(DeedStatus.WAITING_SIGNATURE);
+        DeedStatusHistory statusHistory = new DeedStatusHistory();
+        statusHistory.setDeed(deed);
+        statusHistory.setStatus(DeedStatus.WAITING_SIGNATURE);
+        statusHistory.setNote("Mendapatkan nomor akta");
+        statusHistoryRepo.save(statusHistory);
+
+        return DeedWithStatusHistoriesRecord.fromDeed(deed);
     }
 
     public Page<DeedResponse> findDeedsByUser(Long userId, int page, int size) {
@@ -133,9 +158,15 @@ public class DeedService {
                 .map(DeedResponse::fromEntity);
     }
 
-    public Optional<DeedWithStatusHistoriesRecord> findByDeedIdOrderByUpdatedAtDesc(Long id) {
+    public Page<DeedCompleteResponse> findDeedsAndSiblingByUser(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("deedDate").descending());
+        return deedRepo.findDeedsByCustomerId(userId, pageable)
+                .map(DeedCompleteResponse::fromEntity);
+    }
+
+    public Optional<DeedCompleteResponse> findByDeedIdOrderByUpdatedAtDesc(Long id) {
         Optional<Deed> deedOptional = deedRepo.findById(id);
-        return deedOptional.map(DeedWithStatusHistoriesRecord::fromDeed);
+        return deedOptional.map(DeedCompleteResponse::fromEntity);
     }
 
     public Optional<Deed> findByDeedNumber(String deed_number) {
@@ -162,7 +193,7 @@ public class DeedService {
         deedRepo.save(deed);
     }
 
-    public DeedDocument saveDocument(Long deedId, MultipartFile file, String docType, String username) throws IOException {
+    public DeedDocumentsResponse saveDocument(Long deedId, MultipartFile file, String docType, String username) throws IOException {
         User user = usrRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -179,11 +210,11 @@ public class DeedService {
         DeedDocument doc = new DeedDocument();
         doc.setDeed(deed);
         doc.setDocType(docType); // <- jenis dokumen
-        doc.setName(file.getOriginalFilename());
+        doc.setName(filename);
         doc.setFilePath(uploadPath.toString());
         doc.setStatus("UPLOADED");
 
-        return ddRepo.save(doc);
+        return DeedDocumentsResponse.fromEntity(ddRepo.save(doc));
     }
 
     public void updateDeedDocumentStatus(Long deedId, String status) {

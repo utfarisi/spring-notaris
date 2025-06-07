@@ -10,7 +10,7 @@
                 </ul>
             </div>
 
-            <form @submit.prevent="handleSubmit">
+            <form @submit.prevent="handleSubmit" v-if="requiredDocs.length > 0">
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Jenis Dokumen</label>
                     <select v-model="selectedDocType" class="mt-1 block w-full border p-2 rounded">
@@ -37,6 +37,10 @@
                 </div>
             </form>
 
+            <p v-else class="text-sm text-green-700 mt-4">
+                Semua dokumen wajib telah diunggah.
+            </p>
+
 
             <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" @click="onClose">
                 ✕
@@ -46,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import api from '@/libs/utils'
 import { requiredDocumentsMap } from '@/libs/requiredDocuments'
 
@@ -54,17 +58,33 @@ const props = defineProps<{
     show: boolean
     deed: {
         id: number,
-        deedType: String,
+        deedType: string,
+        deedDocs: Array<{
+            docType: string,
+            status: string,
+            name: string,
+        }>
     },
     onClose: () => void
 }>()
 
-const requiredDocs = computed(() => {
-    return props.deed && props.deed.deedType
-        ? requiredDocumentsMap[props.deed.deedType] || []
-        : []
-})
+const uploadedDocs = ref([...props.deed.deedDocs || []])
 
+watch(() => props.deed, (newDeed) => {
+    uploadedDocs.value = [...newDeed.deedDocs || []]
+}, { immediate: true })
+
+const requiredDocs = computed(() => {
+    if (!props.deed || !props.deed.deedType) return []
+
+    const allRequired = requiredDocumentsMap[props.deed.deedType] || []
+    //const uploadedTypes = (props.deed as any).deedDocs?.map((doc: any) => doc.docType) || []
+    const uploadedTypes = uploadedDocs.value
+        .filter(doc => doc.status !== 'REJECTED')
+        .map(doc => doc.docType)
+    // Kembalikan dokumen yang belum diunggah
+    return allRequired.filter(doc => !uploadedTypes.includes(doc))
+})
 
 const selectedFile = ref<File | null>(null)
 const selectedDocType = ref<string>('')
@@ -84,10 +104,36 @@ const handleSubmit = async () => {
     formData.append('file', selectedFile.value)
     formData.append('docType', selectedDocType.value)
 
+    // Cari dokumen REJECTED yang akan di-update
+    const existingRejected = uploadedDocs.value.find(doc =>
+        doc.docType === selectedDocType.value && doc.status === 'REJECTED'
+    )
+
     try {
-        await api.post(`/deeds/${props.deed.id}/upload`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        })
+        if (existingRejected) {
+            // Update dokumen yang sudah ada (REJECTED)
+            await api.put(`/deed-documents/${existingRejected.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            })
+
+            // Perbarui data di frontend
+            existingRejected.status = 'UPLOADED' // Atau status dari respons jika ada
+            existingRejected.name = selectedFile.value.name
+        } else {
+            // Upload baru
+            const response = await api.post(`/deeds/${props.deed.id}/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            })
+
+            // Tambahkan dokumen baru ke daftar
+            uploadedDocs.value.push({
+                id: response.data.id,
+                docType: selectedDocType.value,
+                status: response.data.status || 'UPLOADED',
+                name: selectedFile.value.name,
+            })
+        }
+
         alert('Dokumen berhasil diunggah.')
         props.onClose()
     } catch (error) {

@@ -2,6 +2,7 @@ package edu.ut.kelompokb.notaryapp.controllers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -18,13 +19,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.ut.kelompokb.notaryapp.dto.DeedCompleteResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedEditRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
-import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
-import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentResponse;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 import edu.ut.kelompokb.notaryapp.security.CustomUserDetails;
@@ -55,10 +56,10 @@ public class DeedController {
     }
 
     @GetMapping("/my-deed")
-    public ResponseEntity<Page<DeedResponse>> indexCustomer(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<DeedCompleteResponse>> indexCustomer(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Long userId = user.getUser().getCustomer().getId();
-        return ResponseEntity.ok(deedSrv.findDeedsByUser(userId, page, size));
+        return ResponseEntity.ok(deedSrv.findDeedsAndSiblingByUser(userId, page, size));
     }
 
     @PostMapping
@@ -92,13 +93,34 @@ public class DeedController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}/number")
+    public ResponseEntity<?> updateNumber(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        System.out.println(" id/number ");
+        Object numberObj = payload.get("number");
+
+        if (numberObj == null) {
+            // Tangani kasus di mana 'number' tidak ada dalam payload
+            System.err.println("Error: 'number' field is missing in the request body.");
+            return ResponseEntity.badRequest().body("Field 'number' is required.");
+        }
+        String number;
+        if (numberObj instanceof String) {
+            number = (String) numberObj;
+        } else {
+            System.err.println("Error: 'number' field has an unexpected type: " + numberObj.getClass().getName() + ". Expected String.");
+            return ResponseEntity.badRequest().body("Invalid type for 'number' field. Expected a string.");
+        }
+
+        return ResponseEntity.ok(deedSrv.updateNumber(id, number));
+    }
+
     @GetMapping("/{id}/documents")
-    public ResponseEntity<List<DeedDocumentResponse>> allDocumentByDeedId(@PathVariable Long id) {
+    public ResponseEntity<List<DeedDocumentsResponse>> allDocumentByDeedId(@PathVariable Long id) {
         return ResponseEntity.ok(ddSrv.findDocumentByDeedId(id));
     }
 
     @PutMapping("/{id}/status")
-    public void updateStatus(@PathVariable Long id, @RequestBody DeedStatusUpdateRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody DeedStatusUpdateRequest request) {
 
         Deed deed = deedSrv.findById(id)
                 .orElseThrow(() -> new RuntimeException("Deed not found"));
@@ -111,7 +133,7 @@ public class DeedController {
         }
 
         // lanjut simpan history dan update status
-        deedSrv.updateStatus(id, request);
+        return ResponseEntity.ok(deedSrv.updateStatus(id, request));
     }
 
     @PostMapping("/{id}/upload")
@@ -122,8 +144,8 @@ public class DeedController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         try {
-            deedSrv.saveDocument(deedId, file, docType, userDetails.getUsername());
-            return ResponseEntity.noContent().build();
+
+            return ResponseEntity.ok(deedSrv.saveDocument(deedId, file, docType, userDetails.getUsername()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IOException e) {
@@ -134,19 +156,21 @@ public class DeedController {
     private boolean isValidTransition(DeedStatus from, DeedStatus to) {
         return switch (from) {
             case DRAFT ->
+                to == DeedStatus.IN_PROGRESS || to == DeedStatus.REJECTED;
+            case REJECTED ->
                 to == DeedStatus.IN_PROGRESS;
             case IN_PROGRESS ->
-                to == DeedStatus.WAITING_SIGNATURE || to == DeedStatus.REJECTED;
+                to == DeedStatus.WAITING_SIGNATURE;
             case WAITING_SIGNATURE ->
                 to == DeedStatus.COMPLETED || to == DeedStatus.REJECTED;
-            case COMPLETED, REJECTED ->
+            case COMPLETED ->
                 false; // sudah final
         };
     }
 
     @GetMapping("/{id}/status-history")
-    public ResponseEntity<DeedWithStatusHistoriesRecord> getStatusHistory(@PathVariable Long id) {
-        DeedWithStatusHistoriesRecord mydata = deedSrv.findByDeedIdOrderByUpdatedAtDesc(id).get();
+    public ResponseEntity<DeedCompleteResponse> getStatusHistory(@PathVariable Long id) {
+        DeedCompleteResponse mydata = deedSrv.findByDeedIdOrderByUpdatedAtDesc(id).get();
         return ResponseEntity.ok(mydata);
     }
 

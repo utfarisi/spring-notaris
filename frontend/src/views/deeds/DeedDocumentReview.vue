@@ -23,6 +23,7 @@
                 <tr class="bg-gray-100 text-left">
                     <th class="px-3 py-2">Nama Dokumen</th>
                     <th class="px-3 py-2">Status</th>
+                    <th class="px-3 py-2">Image</th>
                     <th class="px-3 py-2">Aksi</th>
                 </tr>
             </thead>
@@ -33,6 +34,9 @@
                         <span :class="statusBadge(doc.status)">
                             {{ doc.status }}
                         </span>
+                    </td>
+                    <td class="px-3 py-2">
+                        <button @click="previewDocument(doc)" class="text-blue-600 underline">Lihat</button>
                     </td>
                     <td class="px-3 py-2 flex space-x-2">
                         <a v-if="doc.fileUrl" :href="doc.fileUrl" target="_blank" class="text-blue-600 hover:underline">
@@ -50,19 +54,26 @@
                 </tr>
             </tbody>
         </table>
+
+        <PreviewDocument :preview-url="previewUrl" @close="previewUrl = ''" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import PreviewDocument from '../../components/PreviewDocument.vue';
 import api from '@/libs/utils'
+
+const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 
 const route = useRoute()
 const deedId = route.params.id
 
 const deed = ref<any>({})
 const documents = ref<any[]>([])
+
+const previewUrl = ref('')
 
 onMounted(async () => {
     const [deedRes, docRes] = await Promise.all([
@@ -85,6 +96,12 @@ const verify = async (docId: BigInteger, status: string) => {
     } catch (e) {
         console.error('Verifikasi gagal', e)
     }
+}
+
+const previewDocument = (doc: any) => {
+    // Asumsikan backend Anda sudah bisa melayani file via URL tertentu
+    const fileUrl = `${backendBaseUrl}/${doc.name}` // sesuaikan dengan path public file di backend
+    previewUrl.value = fileUrl
 }
 
 const statusBadge = (status: string) => {

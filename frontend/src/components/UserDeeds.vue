@@ -36,7 +36,7 @@
                         Lihat Detail
                     </button>
                     <button class="bg-yellow-500 text-white px-3 py-1 rounded text-sm hover:bg-yellow-600"
-                        @click="openUploadModal(deed)">
+                        v-if="!isAllDocsUploadedAndApproved(deed)" @click="openUploadModal(deed)">
                         Unggah Dokumen
                     </button>
                 </div>
@@ -52,10 +52,25 @@ import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 import UploadDokumenModal from '@/components/UploadDokumenModal.vue'
 import { useRouter } from 'vue-router'
+import { requiredDocumentsMap } from '../libs/requiredDocuments'
+
 
 const showUploadModal = ref(false)
 const selectedDeed = ref(null)
 const router = useRouter();
+
+const isAllDocsUploadedAndApproved = (deed: any): boolean => {
+    const requiredDocs = requiredDocumentsMap[deed.deedType] || []
+    const uploadedDocs = deed.deedDocs || []
+
+    // Buat map dari dokumen yang sudah di-upload (dengan status APPROVED)
+    const approvedDocTypes = uploadedDocs
+        .filter(doc => doc.status !== 'REJECTED')
+        .map(doc => doc.docType)
+
+    // Cek apakah semua required docs ada di approvedDocTypes
+    return requiredDocs.every(requiredDoc => approvedDocTypes.includes(requiredDoc))
+}
 
 const openUploadModal = (deed: any) => {
     console.log(" deed type ", deed.deedType)

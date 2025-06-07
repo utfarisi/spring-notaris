@@ -3,7 +3,9 @@ package edu.ut.kelompokb.notaryapp.entities;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 import jakarta.persistence.CascadeType;
@@ -53,6 +55,9 @@ public class Deed {
 
     @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeedStatusHistory> statusHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<DeedDocument> documents = new HashSet<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -147,5 +152,13 @@ public class Deed {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void setDocuments(Set<DeedDocument> documents) {
+        this.documents = documents;
+    }
+
+    public Set<DeedDocument> getDocuments() {
+        return documents;
     }
 }

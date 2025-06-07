@@ -1,9 +1,9 @@
 package edu.ut.kelompokb.notaryapp.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
+import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 
@@ -17,14 +17,6 @@ public record DeedWithStatusHistoriesRecord(
         LocalDate deedDate,
         DeedStatus deedStatus,
         List<StatusHistoryRecord> statusHistories) {
-
-    public record StatusHistoryRecord(
-            DeedStatus status,
-            LocalDateTime updatedAt,
-            String note
-            ) {
-
-    }
 
     public static DeedWithStatusHistoriesRecord fromDeed(Deed deed) {
         List<StatusHistoryRecord> histories = deed.getStatusHistories().stream()

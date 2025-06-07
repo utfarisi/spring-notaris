@@ -4,10 +4,12 @@ export const requiredDocumentsMap: Record<string, string[]> = {
     "KTP Pihak Kedua",
     "Draft Perjanjian"
   ],
-  "KELAHIRAN": [
-    "KTP Orang Tua",
-    "Surat Keterangan Lahir dari Rumah Sakit",
-    "Kartu Keluarga"
+  "HAK_MILIK": [
+    "Akta Jual Beli",
+    "Fotocopy KTP",
+    "Fotocopy KK",
+    "Surat pengantar dari keluaran",
+    "Formulir permohonan"
   ],
   "JUAL_BELI": [
     "KTP Penjual",
