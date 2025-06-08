@@ -157,10 +157,6 @@ import DeedNumber from '@/components/DeedNumber.vue'
 import DeedUserDocument from '@/components/DeedUserDocument.vue'
 import SetDeedOnProgress from '@/components/deeds/SetDeedOnProgress.vue'
 
-// Icons - assuming these are properly imported from your icon library
-// import { CheckCircle, XCircle, FileText } from 'lucide-vue-next' // Contoh jika menggunakan lucide-vue-next
-import { CheckCircle, XCircle, FileText } from 'lucide-vue-next'; // Sesuaikan dengan import icon Anda
-
 const authStore = useAuthStore()
 const route = useRoute()
 const deed = ref<any>(null)
