@@ -18,4 +18,6 @@ public interface DeedRepository extends JpaRepository<Deed, Long> {
 
     @Query("SELECT count(d.deed_status) from Deed d where d.deed_status=:status")
     public Integer countByStatus(DeedStatus status);
+
+    public Optional<Deed> findTopByCustomerIdOrderByCreatedAt(Long customerId);
 }

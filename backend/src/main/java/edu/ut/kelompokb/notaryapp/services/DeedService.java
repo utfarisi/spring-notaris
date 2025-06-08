@@ -5,8 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,6 +29,7 @@ import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
+import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.entities.DeedDocument;
@@ -223,6 +227,34 @@ public class DeedService {
 
     public Integer countByStatus(DeedStatus status) {
         return deedRepo.countByStatus(status);
+    }
+
+    public DeedCompleteResponse currentDeed(Long customerId) {
+        Deed deed = deedRepo.findTopByCustomerIdOrderByCreatedAt(customerId)
+                .orElseThrow(() -> new RuntimeException(" Akta tidak ditemukan"));
+
+        List<StatusHistoryRecord> shr = deed.getStatusHistories().stream()
+                .map(StatusHistoryRecord::fromEntity)
+                .toList();
+
+        Set<DeedDocumentsResponse> ddr = deed.getDocuments()
+                .stream()
+                .map(DeedDocumentsResponse::fromEntity)
+                .collect(Collectors.toSet());
+
+        DeedCompleteResponse dcr = new DeedCompleteResponse(
+                deed.getId(),
+                deed.getCustomer().getId(),
+                deed.getNumber(),
+                deed.getDeedType(),
+                deed.getTitle(),
+                deed.getDescription(),
+                deed.getDeed_status(),
+                deed.getDeedDate(),
+                ddr,
+                shr
+        );
+        return dcr;
     }
 
 }

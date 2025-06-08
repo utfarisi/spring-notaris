@@ -42,6 +42,7 @@ const routes = [
       {path:'clients/:id',name:'clientEdit',component:()=>import('@/views/clients/ClientEdit.vue')},
       {path:'clients/:id/show',name:'clientDetail',meta:{roles:['ADMIN']},component:()=>import('@/views/clients/ClientDetail.vue')},
       {path:'operator/deeds/:id/review-documents',meta:{roles:['ADMIN']}, component:()=>import('@/views/deeds/DeedDocumentReview.vue')},
+      {path:'users/deeds/:id/upload-documents',meta:{roles:['USER']}, component:()=>import('@/views/deeds/DeedDocumentUpload.vue')},
       {path:'deeds',name:'akta',component:Deeds},
       {path:'deeds/create',name:'DeedCreate',component:()=>import('@/views/deeds/DeedForm.vue')},
       {path:'deeds/:id/edit',name:'EditAktaForm',component:()=>import('@/views/deeds/EditDeedForm.vue')},

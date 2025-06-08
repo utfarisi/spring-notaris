@@ -25,8 +25,9 @@
 
                     <p class="text-sm mt-1 text-gray-600 mb-2" v-if="deed.description">{{ deed.description }}</p>
                     <p class="text-sm text-gray mb-2 font-xl font-bold">
-                        Status: <span class="px-2 py-1 rounded-sm bg-green-700 text-white">{{ deed.deedStatus
-                        }}</span>
+                        Status: <span class="px-2 py-1 rounded-sm bg-green-700 text-white">{{
+                            translateStatus(deed.deedStatus)
+                            }}</span>
                     </p>
                 </div>
 
@@ -58,6 +59,18 @@ import { requiredDocumentsMap } from '../libs/requiredDocuments'
 const showUploadModal = ref(false)
 const selectedDeed = ref(null)
 const router = useRouter();
+
+const statusTranslations: { [key: string]: string } = {
+    'DRAFT': 'DRAFT',
+    'IN_PROGRESS': 'SEDANG PROSES',
+    'WAITING_SIGNATURE': 'MENUNGGU TANDA TANGAN',
+    'COMPLETED': 'KOMPLIT',
+    'REJECTED': 'DITOLAK'
+};
+
+const translateStatus = (status: string): string => {
+    return statusTranslations[status] || status; // Mengembalikan status asli jika tidak ditemukan
+};
 
 const isAllDocsUploadedAndApproved = (deed: any): boolean => {
     const requiredDocs = requiredDocumentsMap[deed.deedType] || []

@@ -18,7 +18,7 @@
 
 
         <div class="gap-8 flex bg-white px-6 py-4 rounded-lg">
-            <div class="w-2/3 border-e-2 border-gray-300  ">
+            <div class="w-2/3 border-e-2 border-gray-300 ">
                 <div v-if="deed" class="mb-6">
                     <div class="grid grid-cols-[auto_auto_1fr] gap-y-3 gap-x-2">
                         <p class="font-semibold text-left">Nomor Akta</p>
@@ -43,17 +43,15 @@
 
                         <p class="font-semibold text-left">Status Saat Ini</p>
                         <p>:</p>
-                        <p class="px-2 py-1 bg-green-800 rounded-md max-w-min text-white font-bold text-xs">
-                            {{ deed.deedStatus }}
+                        <p class="px-2 py-1 bg-green-800 rounded-md max-w-sm text-white font-bold text-xs">
+                            {{ translateStatus(deed.deedStatus) }}
                         </p>
                     </div>
                 </div>
 
                 <div class="px-4 pt-4 pb-2 border border-1 border-gray-200 mr-3" v-if="authStore.isAdmin">
-
-
                     <div v-if="deed?.deedStatus === statusSteps[0] && documents.length < 1">
-                        Menunggu klien menggupload dokumen
+                        Menunggu klien mengupload dokumen
                     </div>
 
                     <div v-if="(deed?.deedStatus === statusSteps[0] || deed?.deedStatus === statusSteps[4]) && documents.length > 0"
@@ -78,7 +76,7 @@
                                     'px-4 py-2 rounded',
                                     deed.deedStatus === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
                                 ]" disabled>
-                                {{ step }}
+                                {{ translateStatus(step) }}
                             </button>
                         </div>
 
@@ -99,7 +97,7 @@
                                     'px-4 py-2 rounded',
                                     deed.deedStatus === step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
                                 ]" disabled>
-                                {{ step }}
+                                {{ translateStatus(step) }}
                             </button>
                         </div>
 
@@ -137,7 +135,8 @@
                                     d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
                             </svg>
                         </span>
-                        <h3 class="mb-1 text-lg font-semibold text-gray-900 dark:text-white">{{ status.status }}</h3>
+                        <h3 class="mb-1 text-lg font-semibold text-gray-900 dark:text-white">{{
+                            translateStatus(status.status) }}</h3>
                         <time class="block mb-2 text-sm font-bold leading-none text-gray-700 dark:text-gray-300">{{
                             new Date(status.updatedAt).toLocaleString() }}</time>
                         <p class="text-base font-normal text-gray-500 dark:text-gray-400">{{ status.note }}</p>
@@ -158,14 +157,30 @@ import DeedNumber from '@/components/DeedNumber.vue'
 import DeedUserDocument from '@/components/DeedUserDocument.vue'
 import SetDeedOnProgress from '@/components/deeds/SetDeedOnProgress.vue'
 
+// Icons - assuming these are properly imported from your icon library
+// import { CheckCircle, XCircle, FileText } from 'lucide-vue-next' // Contoh jika menggunakan lucide-vue-next
+import { CheckCircle, XCircle, FileText } from 'lucide-vue-next'; // Sesuaikan dengan import icon Anda
 
 const authStore = useAuthStore()
-
 const route = useRoute()
 const deed = ref<any>(null)
 const selectedStatus = ref('')
 const note = ref('')
 const statusSteps = ['DRAFT', 'IN_PROGRESS', 'WAITING_SIGNATURE', 'COMPLETED', 'REJECTED']
+
+// --- Bagian yang Ditambahkan / Dimodifikasi ---
+const statusTranslations: { [key: string]: string } = {
+    'DRAFT': 'DRAFT',
+    'IN_PROGRESS': 'SEDANG PROSES',
+    'WAITING_SIGNATURE': 'MENUNGGU TANDA TANGAN',
+    'COMPLETED': 'KOMPLIT',
+    'REJECTED': 'DITOLAK'
+};
+
+const translateStatus = (status: string): string => {
+    return statusTranslations[status] || status; // Mengembalikan status asli jika tidak ditemukan
+};
+// --- Akhir Bagian yang Ditambahkan / Dimodifikasi ---
 
 const documents = ref<any[]>([])
 
@@ -181,7 +196,6 @@ const fetchDetail = async () => {
     const detailRes = await api.get(`/deeds/${route.params.id}/status-history`)
     deed.value = detailRes.data
     documents.value = detailRes.data?.deedDocs
-    selectedStatus.value = deed.value.current_status
 }
 
 const selectStatus = (status: string) => {
@@ -189,15 +203,16 @@ const selectStatus = (status: string) => {
 }
 
 const submitStatus = async () => {
+    let nextStatusIndex = statusSteps.indexOf(deed.value.deedStatus);
 
-    let i = statusSteps.indexOf(deed.value.deedStatus);
-    if (i !== -1) {
-        i++
-        selectedStatus.value = statusSteps[i];
+    if (nextStatusIndex !== -1 && nextStatusIndex < statusSteps.length - 1) {
+        nextStatusIndex++;
+        selectedStatus.value = statusSteps[nextStatusIndex];
+    } else {
+        console.warn("Attempted to advance status beyond defined steps or current status not found.");
     }
 
-    console.log(" selected Status ", selectedStatus.value)
-    console.log(statusSteps[i])
+    console.log("selected Status (after calculation): ", selectedStatus.value)
 
     await api.put(`/deeds/${route.params.id}/status`, {
         status: selectedStatus.value,
