@@ -24,13 +24,14 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import api from '@/libs/utils'
-import { useRouter } from 'vue-router'
+<script setup>
+import { ref } from 'vue';
+import api from '@/libs/utils'; // Pastikan path ini benar dan `api` diekspor dengan benar
+import { useRouter } from 'vue-router';
 
-const router = useRouter()
+const router = useRouter();
 
+// Deklarasikan form dengan tipe RegisterForm
 const form = ref({
   username: '',
   password: '',
@@ -40,17 +41,18 @@ const form = ref({
   lastname: '',
   phone: '',
   address: ''
-})
+});
 
 const register = async () => {
   try {
-    await api.post('/auth/register', form.value)
-    alert('Registration successful!')
-    router.push('/login')
-  } catch (err: any) {
-    alert(err.response?.data || 'Registration failed')
+    // Akses form.value yang sudah bertipe RegisterForm
+    await api.post('/auth/register', form.value);
+    alert('Registration successful!');
+    router.push('/login');
+  } catch (err) { // err: any di sini sudah benar jika Anda belum mendefinisikan tipe error yang lebih spesifik
+    alert(err.response?.data || 'Registration failed');
   }
-}
+};
 </script>
 
 <style scoped></style>

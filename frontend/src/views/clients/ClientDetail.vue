@@ -8,7 +8,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script>
 import api from '@/libs/utils';
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

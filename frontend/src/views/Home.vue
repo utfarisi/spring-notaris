@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import AdminDashboard from '../components/AdminDashboard.vue'

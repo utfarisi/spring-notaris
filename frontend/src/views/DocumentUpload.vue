@@ -11,16 +11,16 @@
 
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import { useAuthStore } from '../stores/authStore'
 import api from '@/libs/utils'
 
-const file = ref<File | null>(null)
+const file = ref < File | null > (null)
 const authStore = useAuthStore()
 
-function onFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
+function onFileChange(event) {
+  const target = event.target
   file.value = target.files?.[0] || null
 }
 

@@ -24,7 +24,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/libs/utils'
@@ -52,7 +52,7 @@ const handleLogin = async () => {
 
     // Redirect ke home
     router.push({ name: 'Home' })
-  } catch (err: any) {
+  } catch (err) {
     error.value = err.response?.data || 'Login failed'
     console.log(" error ", error.value)
   }

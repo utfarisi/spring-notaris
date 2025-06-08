@@ -18,7 +18,7 @@ export default defineConfig({
         changeOrigin: true,
         secure:false,
         configure: (proxy) => {
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (proxyReq) => {
             proxyReq.setHeader('Origin', 'http://localhost:5173');
           });
         },

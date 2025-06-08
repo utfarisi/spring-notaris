@@ -35,7 +35,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 
@@ -51,7 +51,7 @@ const fetchAppointments = async () => {
     console.log(res?.totalElements);
 }
 
-const cancelAppointment = async (id: number) => {
+const cancelAppointment = async (id) => {
     if (!confirm('Yakin ingin membatalkan janji ini?')) return
 
     try {
@@ -62,7 +62,7 @@ const cancelAppointment = async (id: number) => {
     }
 }
 
-const confirmAppointment = async (id: number) => {
+const confirmAppointment = async (id) => {
     try {
         await api.patch(`/appointments/${id}/confirm`)
         await fetchAppointments()

@@ -54,7 +54,7 @@
     </div>
 </template>
 
-<script setup="ts">
+<script>
 import { ref, reactive, onMounted } from 'vue'
 import api from '@/libs/utils'
 

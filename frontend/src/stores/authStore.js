@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
-import api from '@/libs/utils';
+import api from '@/libs/utils'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as null | { id: number; username: string;  role: string; authorities: string[]; email: string; customerId:number | null;firstname:string; lastname:string; address:string}
+    user: { id: 0, username: '',  role: '', authorities: [], email: '', customerId:null,firstname:'', lastname:'', address:''}
   }),
    getters: {
     isAuthenticated: (state) => !!state.user,

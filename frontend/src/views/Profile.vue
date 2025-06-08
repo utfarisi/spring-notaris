@@ -58,13 +58,13 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import api from '@/libs/utils'
 
 const authStore = useAuthStore()
-const user = authStore.user!
+const user = authStore.user
 const form = ref({ username: user.username, email: user.email, firstname: user.firstname, lastname: user.lastname, address: user.address })
 
 const password = ref({
@@ -95,7 +95,7 @@ const changePassword = async () => {
         password.value.oldPassword = ''
         password.value.newPassword = ''
         password.value.confirmPassword = ''
-    } catch (err: any) {
+    } catch (err) {
         error.value = err.response?.data || 'Gagal mengganti password.'
     }
 }

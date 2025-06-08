@@ -62,7 +62,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref } from 'vue'
 import api from '@/libs/utils'
 
@@ -86,7 +86,7 @@ const loadAppointments = async () => {
     }
 }
 
-const cancelAppointment = async (id: number) => {
+const cancelAppointment = async (id) => {
     if (!confirm('Yakin ingin membatalkan janji ini?')) return
 
     try {
@@ -97,13 +97,13 @@ const cancelAppointment = async (id: number) => {
     }
 }
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('id-ID', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
 }
 
-const badgeClass = (status: string) => {
+const badgeClass = (status) => {
     return {
         'PENDING': 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-sm',
         'CONFIRMED': 'bg-green-100 text-green-700 px-2 py-1 rounded text-sm',

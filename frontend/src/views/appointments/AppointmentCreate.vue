@@ -73,13 +73,13 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, watch } from 'vue'
 import api from '@/libs/utils'
 import { useAuthStore } from '@/stores/authStore'
 
 
-const availableTimes = ref<string[]>([])
+const availableTimes = ref([])
 const loadingTimes = ref(false)
 const authStore = useAuthStore();
 const user = authStore.user
@@ -109,7 +109,7 @@ watch(
                 }
             })
 
-            availableTimes.value = res.data.map((timeStr: string) => timeStr.substring(0, 5))
+            availableTimes.value = res.data.map((timeStr) => timeStr.substring(0, 5))
         } catch (e) {
             console.error('Gagal mengambil waktu janji', e)
             availableTimes.value = []
@@ -135,7 +135,7 @@ const submitAppointment = async () => {
         // Redirect ke halaman konfirmasi, detail, atau kosongkan form
         form.value = { userId: user.id, appointmentDate: '', appointmentTime: '', description: '', durationMinute: 30 }
         availableTimes.value = []
-    } catch (err: any) {
+    } catch (err) {
         if (err.response?.status === 409) {
             alert('Waktu yang dipilih sudah terisi. Silakan pilih waktu lain.')
         } else {

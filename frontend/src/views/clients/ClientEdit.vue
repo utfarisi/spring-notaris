@@ -3,5 +3,5 @@
         <h3>Edit CLient</h3>
     </div>
 </template>
-<script lang="ts">
+<script>
 </script>

@@ -6,6 +6,6 @@
     </div>
 </template>
 
-<script setup="ts">
+<script>
 
 </script>

@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 // Kosong atau tambahkan logika global jika perlu
 </script>
 
