@@ -69,14 +69,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
         Optional<User> userOptional = userService.findByUsername(request.getUsername());
-        System.out.println(" Login starting ");
+
         if (userOptional.isEmpty()
                 || !passwordEncoder.matches(request.getPassword(), userOptional.get().getPassword())) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
         String token = jwtService.generateToken(userOptional.get().getUsername());
-        System.out.println(" token pada methode login AuthController " + token);
+
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .secure(false) // set to true if using HTTPS

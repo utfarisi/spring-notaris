@@ -25,6 +25,7 @@ import edu.ut.kelompokb.notaryapp.dto.DeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
+import edu.ut.kelompokb.notaryapp.dto.ProcessDeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
@@ -132,8 +133,23 @@ public class DeedController {
             throw new IllegalArgumentException("Transisi status tidak valid dari " + currentStatus + " ke " + newStatus);
         }
 
-        // lanjut simpan history dan update status
         return ResponseEntity.ok(deedSrv.updateStatus(id, request));
+    }
+
+    @PutMapping("/{id}/set-on-progress")
+    public ResponseEntity<?> onProgress(@PathVariable Long id, @RequestBody ProcessDeedRequest request) {
+
+        Deed deed = deedSrv.findById(id)
+                .orElseThrow(() -> new RuntimeException("Deed not found"));
+
+        DeedStatus currentStatus = deed.getDeed_status(); // misalnya kita ambil dari last history
+        DeedStatus newStatus = DeedStatus.IN_PROGRESS;
+
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException("Transisi status tidak valid dari " + currentStatus + " ke " + newStatus);
+        }
+
+        return ResponseEntity.ok(deedSrv.setOnProgress(id, request));
     }
 
     @PostMapping("/{id}/upload")

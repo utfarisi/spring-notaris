@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,6 +30,7 @@ import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
+import edu.ut.kelompokb.notaryapp.dto.ProcessDeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
@@ -46,6 +49,8 @@ import jakarta.validation.ValidationException;
 
 @Service
 public class DeedService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeedService.class);
 
     private final DeedRepository deedRepo;
     private final CustomerRepository customerRepository;
@@ -102,7 +107,7 @@ public class DeedService {
 
     public DeedResponse saveDeed(DeedRequest request) {
         Customer customer = customerRepository.findById(request.customer_id())
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
         Deed deed = new Deed();
         deed.setNumber(request.deed_number());
@@ -129,13 +134,30 @@ public class DeedService {
     @Transactional
     public DeedWithStatusHistoriesRecord updateStatus(Long id, DeedStatusUpdateRequest request) {
         Deed deed = deedRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Akta tidak ditemukan!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan!"));
 
         deed.setDeed_status(request.status());
 
         DeedStatusHistory statusHistory = new DeedStatusHistory();
         statusHistory.setDeed(deed);
         statusHistory.setStatus(request.status());
+        statusHistory.setNote(request.note());
+        statusHistoryRepo.save(statusHistory);
+
+        return DeedWithStatusHistoriesRecord.fromDeed(deed);
+    }
+
+    @Transactional
+    public DeedWithStatusHistoriesRecord setOnProgress(Long id, ProcessDeedRequest request) {
+        Deed deed = deedRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan!"));
+
+        deed.setDeed_status(DeedStatus.IN_PROGRESS);
+        deed.setNumber(request.number());
+
+        DeedStatusHistory statusHistory = new DeedStatusHistory();
+        statusHistory.setDeed(deed);
+        statusHistory.setStatus(DeedStatus.IN_PROGRESS);
         statusHistory.setNote(request.note());
         statusHistoryRepo.save(statusHistory);
 
@@ -185,7 +207,7 @@ public class DeedService {
         }
 
         Customer customer = customerRepository.findById(request.customer_id())
-                .orElseThrow(() -> new RuntimeException("Pelanggan tidak ditemukan"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pelanggan tidak ditemukan"));
 
         deed.setNumber(request.deed_number());
         deed.setDeedDate(request.deed_date());
@@ -202,7 +224,7 @@ public class DeedService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         Deed deed = deedRepo.findById(deedId)
-                .orElseThrow(() -> new IllegalArgumentException("Akta tidak ditemukan."));
+                .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan."));
 
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
@@ -231,8 +253,9 @@ public class DeedService {
 
     public DeedCompleteResponse currentDeed(Long customerId) {
         Deed deed = deedRepo.findTopByCustomerIdOrderByCreatedAt(customerId)
-                .orElseThrow(() -> new RuntimeException(" Akta tidak ditemukan"));
+                .orElseThrow(() -> new ResourceNotFoundException("belum ada akta pada user ini"));
 
+        System.out.println(" apakah ini jalan ");
         List<StatusHistoryRecord> shr = deed.getStatusHistories().stream()
                 .map(StatusHistoryRecord::fromEntity)
                 .toList();

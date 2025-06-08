@@ -8,24 +8,32 @@
 
         <div class="bg-white p-4 rounded shadow col-span-1">
             <h3 class="text-sm text-gray-500">Status Akta Terbaru</h3>
-            <p class="text-lg font-semibold text-green-600">
+            <p v-if="currentDeed" class="text-lg font-semibold text-green-600">
                 {{ translateStatus(currentDeed?.deedStatus) }}
+            </p>
+            <p v-else class="text-lg font-semibold text-gray-500">
+                Belum ada akta
             </p>
         </div>
 
         <div class="bg-white p-4 rounded shadow col-span-1">
             <h3 class="text-sm text-gray-500">Dokumen Akta Terbaru</h3>
-            <p v-if="documentsPendingCount > 0" class="text-lg font-semibold text-yellow-600">
-                {{ documentsPendingCount }} dokumen belum lengkap
+            <div v-if="currentDeed">
+                <p v-if="documentsPendingCount > 0" class="text-lg font-semibold text-yellow-600">
+                    {{ documentsPendingCount }} dokumen belum lengkap
+                </p>
+                <p v-else class="text-lg font-semibold text-green-600">
+                    Semua dokumen lengkap
+                </p>
+                <router-link v-if="documentsPendingCount > 0" :to="`users/deeds/${currentDeed.id}/upload-documents`"
+                    class="text-sm text-blue-600 hover:underline">
+                    Unggah Sekarang
+                </router-link>
+                <span v-else class="text-sm text-gray-500">Tidak ada aksi diperlukan</span>
+            </div>
+            <p v-else class="text-lg font-semibold text-gray-500">
+                Belum ada akta
             </p>
-            <p v-else class="text-lg font-semibold text-green-600">
-                Semua dokumen lengkap
-            </p>
-            <router-link v-if="documentsPendingCount > 0" :to="`users/deeds/${currentDeed.id}/upload-documents`"
-                class="text-sm text-blue-600 hover:underline">
-                Unggah Sekarang
-            </router-link>
-            <span v-else class="text-sm text-gray-500">Tidak ada aksi diperlukan</span>
         </div>
 
         <div class="col-span-full flex gap-4 mt-4">
@@ -39,15 +47,15 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useRouter } from 'vue-router'
-import { ref, onMounted, computed } from 'vue'; // Import 'computed'
+import { ref, onMounted, computed } from 'vue';
 import api from '@/libs/utils'
 import { requiredDocumentsMap } from '@/libs/requiredDocuments'
 
 const router = useRouter();
 
-const statusTranslations: { [key: string]: string } = {
+const statusTranslations = {
     'DRAFT': 'DRAFT',
     'IN_PROGRESS': 'SEDANG PROSES',
     'WAITING_SIGNATURE': 'MENUNGGU TANDA TANGAN',
@@ -55,7 +63,7 @@ const statusTranslations: { [key: string]: string } = {
     'REJECTED': 'DITOLAK'
 };
 
-const translateStatus = (status: string): string => {
+const translateStatus = (status) => {
     return statusTranslations[status] || status;
 };
 
@@ -63,14 +71,15 @@ const createAppointment = () => {
     router.push({ name: 'appointmentCreate' })
 }
 
-const currentDeed = ref<any>(null) // Inisialisasi dengan null
+const currentDeed = ref(null) // Tetap inisialisasi dengan null
 const documentsPendingCount = computed(() => {
+    // Pastikan currentDeed.value ada sebelum mencoba mengakses propertinya
     if (!currentDeed.value || !currentDeed.value.deedType || !requiredDocumentsMap[currentDeed.value.deedType]) {
         return 0; // Jika data belum ada, atau jenis akta tidak ditemukan
     }
 
     const requiredDocs = requiredDocumentsMap[currentDeed.value.deedType];
-    const uploadedDocs = currentDeed.value.deedDocs.map((doc: any) => doc.docType);
+    const uploadedDocs = currentDeed.value.deedDocs.map((doc) => doc.docType);
 
     let pendingCount = 0;
     for (const requiredDoc of requiredDocs) {
@@ -91,7 +100,13 @@ onMounted(async () => {
         currentDeed.value = currentDeedRes.data;
     } catch (error) {
         console.error("Error fetching current deed:", error);
-        // Tangani error, misal tampilkan pesan ke user
+        if (error.response && error.response.status === 404) {
+            console.log("Tidak ada akta ditemukan untuk user ini.");
+        } else {
+            console.error("Terjadi kesalahan lain saat mengambil akta:", error.message);
+        }
     }
 });
 </script>
+
+<style scoped></style>

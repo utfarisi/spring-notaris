@@ -37,9 +37,7 @@ if (authStore.isAdmin) {
     { icon: 'Home', label: 'Dashboard', path: '/' },
     { icon: 'User', label: 'Klien', path: '/clients' },
     { icon: 'Book', label: 'Akta', path: '/deeds' },
-    { icon: 'Calendar', label: 'Jadwal', path: '/appointments' },
-    { icon: 'Users', label: 'Pengguna', path: '/users' },
-    { icon: 'Settings', label: 'Pengaturan', path: '/settings' },
+    { icon: 'Calendar', label: 'Jadwal', path: '/appointments' }
   ]
 }
 else {
