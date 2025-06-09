@@ -1,11 +1,16 @@
-// src/libs/utils.ts
 import axios from 'axios'
 import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
 
-const API_BASE_URL = 'https://spring-notaris-production.up.railway.app';
+// Gunakan variabel lingkungan yang disuntikkan oleh Vite
+// Pastikan variabel ini diberi prefix VITE_ atau ENV_ (sesuai config Vite)
+// Di Vite, variabel lingkungan harus diawali dengan VITE_ (default)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/'; // Default ke '/' jika tidak ada (untuk relative paths)
 
 const api = axios.create({
+  // Jika VITE_API_BASE_URL di Railway diset ke 'https://spring-notaris-production.up.railway.app',
+  // maka ini akan jadi 'https://spring-notaris-production.up.railway.app/api'
+  // Jika tidak diset, dan default ke '/', ini akan jadi '/api' (relative path)
   baseURL: API_BASE_URL + '/api',
   withCredentials: true
 })
