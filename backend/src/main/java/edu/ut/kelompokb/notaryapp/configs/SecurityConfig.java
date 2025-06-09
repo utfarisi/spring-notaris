@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/login", "/api/auth/register", "/", "/index.html", "/css/**", "/js/**", "/img/**", "/*.ico", "/*.png", "/swagger-ui/**", "/v3/api/docs/**").permitAll()
-                .requestMatchers("/vite.svg", "/assets/**", "/assets/index-Cwgy1Y1I.js").permitAll()
+                .requestMatchers("/vite.svg", "/assets/index-Cwgy1Y1I.js", "/assets/**").permitAll()
                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
