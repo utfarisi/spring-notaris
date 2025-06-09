@@ -16,7 +16,7 @@ export default defineConfig({
       '/api': {
         target: 'https://spring-notaris-production.up.railway.app',
         changeOrigin: true,
-        secure:false,
+        secure:true,
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq) => {
             proxyReq.setHeader('Origin', 'http://localhost:5173');
