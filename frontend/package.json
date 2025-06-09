@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "echo \"VITE_API_BASE_URL is: $VITE_API_BASE_URL\" && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
