@@ -4,7 +4,7 @@
             <div class="flex flex-col gap-3 mb-4">
                 <div class="flex flex-col">
                     <label for="deedNumber" class="text-sm text-gray-600 mb-1">Nomor Akta:</label>
-                    <input type="text" id="deedNumber" v-model="deedNumberInput" placeholder="Masukkan Nomor Akta"
+                    <input type="number" id="deedNumber" v-model="deedNumberInput" placeholder="Masukkan Nomor Akta"
                         class="border p-2 rounded w-full" :disabled="isProcessing" />
                 </div>
                 <div class="flex flex-col">
@@ -161,11 +161,12 @@ const submitProcessStatus = async () => {
 
     try {
         const payload = {
+            status: 'IN_PROGRESS',
             note: processNoteInput.value || 'Dokumen telah diverifikasi dan akta sedang diproses.',
             number: deedNumberInput.value
         };
 
-        const deedRest = await api.put(`/deeds/${props.deed.id}/set-on-progress`, payload, { withCredentials: true });
+        const deedRest = await api.put(`/deeds/${props.deed.id}/status`, payload, { withCredentials: true });
 
         emit('saved', deedRest.data);
         processSuccess.value = "Akta berhasil diproses dan status diatur IN_PROGRESS.";
