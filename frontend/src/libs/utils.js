@@ -3,7 +3,7 @@ import axios from 'axios'
 import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const API_BASE_URL = 'https://spring-notaris-production.up.railway.app';
 
 const api = axios.create({
   baseURL: API_BASE_URL + '/api',
