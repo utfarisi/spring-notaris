@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
+import edu.ut.kelompokb.notaryapp.dto.invoices.InvoiceWithoutDeedResponse;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 
@@ -20,7 +21,8 @@ public record DeedCompleteResponse(
         DeedStatus deedStatus,
         LocalDate deedDate,
         Set<DeedDocumentsResponse> deedDocs,
-        List<StatusHistoryRecord> statusHistories
+        List<StatusHistoryRecord> statusHistories,
+        InvoiceWithoutDeedResponse invoice
         ) {
 
     public static DeedCompleteResponse fromEntity(Deed deed) {
@@ -33,6 +35,8 @@ public record DeedCompleteResponse(
                 .map(StatusHistoryRecord::fromEntity)
                 .toList();
 
+        InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+
         return new DeedCompleteResponse(
                 deed.getId(),
                 deed.getCustomer().getId(),
@@ -43,7 +47,8 @@ public record DeedCompleteResponse(
                 deed.getDeed_status(),
                 deed.getDeedDate(),
                 deedDocs,
-                listShr
+                listShr,
+                invoice
         );
     }
 }

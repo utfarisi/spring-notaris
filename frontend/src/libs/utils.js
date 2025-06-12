@@ -3,7 +3,7 @@ import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://spring-notaris-production.up.railway.app'; // Default ke '/' jika tidak ada (untuk relative paths)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'; // Default ke '/' jika tidak ada (untuk relative paths)
 
 const api = axios.create({
   

@@ -47,6 +47,26 @@ const routes = [
       {path:'deeds/create',name:'DeedCreate',component:()=>import('@/views/deeds/DeedForm.vue')},
       {path:'deeds/:id/edit',name:'EditAktaForm',component:()=>import('@/views/deeds/EditDeedForm.vue')},
       {path:'deeds/:id',name:'DeedDetail',component:()=>import('@/views/deeds/DeedDetail.vue')},
+      {
+        path: '/invoices/:id',
+        name: 'InvoicePreview',
+        component: () => import('@/components/invoices/InvoicePreview.vue') // atau ke `pages/invoice/`
+      },
+      {
+        path:'/my-invoices',
+        name:'InvoiceListCustomer',
+        component: ()=>import('@/components/invoices/InvoiceListCustomer.vue')
+      },
+      {
+        path:'/invoices',
+        name:'InvoiceListAdmin',
+        component: ()=>import('@/components/invoices/InvoiceListAdmin.vue')
+      },
+      {
+        path:'/metode-bayar',
+        name:'MetodeBayar',
+        component:()=>import('@/components/BankSelectionDropdown.vue')
+      },
       {path:'appointments',name:'appointments',meta:{roles:['ADMIN']},component:()=>import('@/views/appointments/Appointments.vue')},
       {path:'appointments/create',name:'appointmentCreate',meta:{roles:['USER']},component:()=>import('@/views/appointments/AppointmentCreate.vue')},
       {path:'appointments/my-appointments',name:'my-appointments',meta:{roles:['USER']},component:()=>import('@/views/appointments/MyAppointments.vue')},

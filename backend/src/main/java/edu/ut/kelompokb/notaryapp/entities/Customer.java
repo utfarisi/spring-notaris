@@ -2,8 +2,6 @@ package edu.ut.kelompokb.notaryapp.entities;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -117,4 +115,7 @@ public class Customer {
         return updatedAt;
     }
 
+    public String getFullname() {
+        return firstName + " " + lastName;
+    }
 }

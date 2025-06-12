@@ -20,6 +20,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -53,6 +54,9 @@ public class Deed {
     @Enumerated(EnumType.STRING)
     private DeedStatus deed_status = DeedStatus.DRAFT;
 
+    @OneToOne(mappedBy = "deed", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Invoice invoice;
+
     @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeedStatusHistory> statusHistories = new ArrayList<>();
 
@@ -73,7 +77,6 @@ public class Deed {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters & Setters
     public Long getId() {
         return id;
     }
@@ -160,5 +163,13 @@ public class Deed {
 
     public Set<DeedDocument> getDocuments() {
         return documents;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 }

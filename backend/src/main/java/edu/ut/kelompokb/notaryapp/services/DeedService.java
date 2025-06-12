@@ -33,6 +33,7 @@ import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
 import edu.ut.kelompokb.notaryapp.dto.ProcessDeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
+import edu.ut.kelompokb.notaryapp.dto.invoices.InvoiceWithoutDeedResponse;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.entities.DeedDocument;
@@ -190,9 +191,9 @@ public class DeedService {
                 .map(DeedCompleteResponse::fromEntity);
     }
 
-    public Optional<DeedCompleteResponse> findByDeedIdOrderByUpdatedAtDesc(Long id) {
-        Optional<Deed> deedOptional = deedRepo.findById(id);
-        return deedOptional.map(DeedCompleteResponse::fromEntity);
+    public DeedCompleteResponse findByDeedIdOrderByUpdatedAtDesc(Long id) {
+        Deed deed = deedRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(" Akta tidak ditemukan"));
+        return DeedCompleteResponse.fromEntity(deed);
     }
 
     public Optional<Deed> findByDeedNumber(String deed_number) {
@@ -264,6 +265,7 @@ public class DeedService {
                 .stream()
                 .map(DeedDocumentsResponse::fromEntity)
                 .collect(Collectors.toSet());
+        InvoiceWithoutDeedResponse invoice = InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
 
         DeedCompleteResponse dcr = new DeedCompleteResponse(
                 deed.getId(),
@@ -275,7 +277,8 @@ public class DeedService {
                 deed.getDeed_status(),
                 deed.getDeedDate(),
                 ddr,
-                shr
+                shr,
+                invoice
         );
         return dcr;
     }

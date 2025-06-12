@@ -1,11 +1,13 @@
 package edu.ut.kelompokb.notaryapp.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +31,7 @@ import edu.ut.kelompokb.notaryapp.dto.ProcessDeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
+import edu.ut.kelompokb.notaryapp.exceptions.ResourceNotFoundException;
 import edu.ut.kelompokb.notaryapp.security.CustomUserDetails;
 import edu.ut.kelompokb.notaryapp.services.DeedDocumentService;
 import edu.ut.kelompokb.notaryapp.services.DeedService;
@@ -185,9 +188,21 @@ public class DeedController {
     }
 
     @GetMapping("/{id}/status-history")
-    public ResponseEntity<DeedCompleteResponse> getStatusHistory(@PathVariable Long id) {
-        DeedCompleteResponse mydata = deedSrv.findByDeedIdOrderByUpdatedAtDesc(id).get();
-        return ResponseEntity.ok(mydata);
+    public ResponseEntity<?> getStatusHistory(@PathVariable Long id) {
+
+        try {
+            return ResponseEntity.ok(deedSrv.findByDeedIdOrderByUpdatedAtDesc(id));
+        } catch (ResourceNotFoundException ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Not Found");
+            errorBody.put("message", ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{id}/required-documents")

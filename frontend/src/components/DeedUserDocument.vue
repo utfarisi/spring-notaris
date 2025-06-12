@@ -1,9 +1,9 @@
 <template>
     <div class="p-2">
-        <h3 class="text-lg font-bold mb-4">Daftar Dokumen</h3>
+        <h3 class="mb-4 text-lg font-bold">Daftar Dokumen</h3>
         <div class="flex flex-wrap gap-3">
             <div v-for="doc in documents" :key="doc.id"
-                class="w-full sm:w-auto flex-grow border border-gray-400 p-2 rounded-2xl">
+                class="flex-grow w-full p-2 border border-gray-400 sm:w-auto rounded-2xl">
                 <div>
                     <p class="font-semibold">{{ doc.docType }}</p>
                     <p class="text-sm">
@@ -16,7 +16,7 @@
                 <div class="flex gap-2">
                     <button @click="previewDocument(doc)" class="text-blue-600 underline">Lihat</button>
                     <button v-if="doc.status === 'REJECTED'" @click="emitReupload(doc)"
-                        class="bg-yellow-500 text-white text-sm px-2 py-1 rounded hover:bg-yellow-600">
+                        class="px-2 py-1 text-sm text-white bg-yellow-500 rounded hover:bg-yellow-600">
                         Unggah Ulang
                     </button>
                 </div>

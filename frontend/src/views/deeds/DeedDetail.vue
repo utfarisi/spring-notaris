@@ -1,24 +1,24 @@
 <template>
     <div>
-        <div class="flex gap-3 items-center mb-4">
-            <h2 class="text-2xl font-semibold w-10/12">Detail Akta</h2>
+        <div class="flex items-center gap-3 mb-4">
+            <h2 class="w-10/12 text-2xl font-semibold">Detail Akta</h2>
 
             <router-link v-if="deed?.deedStatus === 'DRAFT' && authStore.isUser"
                 :to="{ name: 'EditAktaForm', params: { id: route.params.id } }"
-                class="bg-blue-400 px-4 py-2 rounded-md text-white text-sm">
+                class="px-4 py-2 text-sm text-white bg-blue-400 rounded-md">
                 Edit
             </router-link>
 
             <router-link
                 v-if="authStore.isAdmin && (deed?.deedStatus === statusSteps[0] || deed?.deedStatus === statusSteps[4]) && documents.length > 0"
                 :to="`/operator/deeds/${route.params.id}/review-documents`"
-                class="bg-green-500 px-4 py-2 rounded-md text-white text-sm">
+                class="px-4 py-2 text-sm text-white bg-green-500 rounded-md">
                 Verifikasi Dokumen
             </router-link>
         </div>
 
-        <div class="gap-8 flex bg-white px-6 py-4 rounded-lg">
-            <div class="w-2/3 border-e-2 border-gray-300 ">
+        <div class="flex gap-8 px-6 py-4 bg-white rounded-lg">
+            <div class="w-2/3 border-gray-300 border-e-2 ">
                 <div v-if="deed" class="mb-6">
                     <div class="grid grid-cols-[auto_auto_1fr] gap-y-3 gap-x-2">
                         <p class="font-semibold text-left">Nomor Akta</p>
@@ -39,17 +39,20 @@
 
                         <p class="font-semibold text-left">Tanggal</p>
                         <p>:</p>
-                        <p>{{ deed.deedDate }}</p>
+                        <p>{{ formatDate(deed.deedDate) }}</p>
 
                         <p class="font-semibold text-left">Status Saat Ini</p>
                         <p>:</p>
-                        <p class="px-2 py-1 bg-green-800 rounded-md max-w-sm text-white font-bold text-xs">
-                            {{ translateStatus(deed.deedStatus) }}
-                        </p>
+                        <div class="flex justify-start">
+                            <span class="px-2 py-1 font-bold text-white bg-green-300 rounded">
+                                {{ translateStatus(deed.deedStatus) }}
+                            </span>
+                        </div>
+
                     </div>
                 </div>
 
-                <div class="px-4 pt-4 pb-2 border border-1 border-gray-200 mr-3">
+                <div class="px-4 pt-4 pb-2 mr-3 border border-gray-200 border-1">
                     <div v-if="authStore.isAdmin">
                         <div v-if="deed?.deedStatus === statusSteps[0] && documents.length < 1">
                             Menunggu klien mengupload dokumen
@@ -59,7 +62,7 @@
                             v-else-if="(deed?.deedStatus === statusSteps[0] || deed?.deedStatus === statusSteps[4]) && documents.length > 0">
                             <div class="flex flex-wrap items-center gap-3 mb-4">
                                 <button v-for="doc in documents" :key="doc.id"
-                                    class="flex items-center gap-2 px-4 py-2 rounded border border-gray-400" disabled>
+                                    class="flex items-center gap-2 px-4 py-2 border border-gray-400 rounded" disabled>
                                     {{ doc.docType }}
                                     <component :is="CheckCircle" v-if="doc.status === 'APPROVED'"
                                         class="text-green-900" />
@@ -78,10 +81,10 @@
                                 Siap untuk Proses Tanda Tangan
                             </h4>
                             <textarea v-model="note" placeholder="Catatan perubahan status (opsional)"
-                                class="w-full border p-2 mb-3 rounded"></textarea>
+                                class="w-full p-2 mb-3 border rounded"></textarea>
 
                             <button @click="submitStatus('WAITING_SIGNATURE')"
-                                class="bg-green-600 text-white px-4 py-2 rounded disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="px-4 py-2 text-white bg-green-600 rounded disabled:opacity-50 disabled:cursor-not-allowed">
                                 Proses Tanda Tangan
                             </button>
                         </div>
@@ -89,16 +92,16 @@
                         <div v-else-if="deed?.deedStatus === statusSteps[2]">
                             <h3 class="mb-3 text-lg font-medium text-gray-900">Selesaikan Proses Akta</h3>
                             <textarea v-model="note" placeholder="Catatan perubahan status (opsional)"
-                                class="w-full border p-2 mb-3 rounded"></textarea>
+                                class="w-full p-2 mb-3 border rounded"></textarea>
 
                             <button @click="submitStatus('COMPLETED')"
-                                class="bg-green-600 text-white px-4 py-2 rounded">
+                                class="px-4 py-2 text-white bg-green-600 rounded">
                                 Selesaikan Akta
                             </button>
                         </div>
 
                         <div v-else-if="deed?.deedStatus === statusSteps[3]">
-                            Akta sudah selesai
+                            <DeedComplete :deed="deed" @open-invoice-form="openInvoiceForm" />
                         </div>
 
                         <div v-else-if="deed?.deedStatus === statusSteps[4]">
@@ -110,11 +113,11 @@
                 </div>
             </div>
 
-            <div class="pl-3 w-1/3">
-                <h3 class="text-xl font-medium mb-2">Riwayat Status</h3>
+            <div class="w-1/3 pl-3">
+                <h3 class="mb-2 text-xl font-medium">Riwayat Status</h3>
 
-                <ol class="relative border-s border-gray-200 dark:border-gray-700">
-                    <li v-for="(status, index) in deed?.statusHistories" :key="index" class="ms-6 pb-4">
+                <ol class="relative border-gray-200 border-s dark:border-gray-700">
+                    <li v-for="(status, index) in deed?.statusHistories" :key="index" class="pb-4 ms-6">
                         <span
                             class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
                             <svg class="w-2.5 h-2.5 text-blue-800 dark:text-blue-300" aria-hidden="true"
@@ -132,6 +135,7 @@
                 </ol>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -142,6 +146,8 @@ import api from '@/libs/utils';
 import { useAuthStore } from '@/stores/authStore';
 import DeedUserDocument from '@/components/DeedUserDocument.vue';
 import SetDeedOnProgress from '@/components/deeds/SetDeedOnProgress.vue';
+import { formatDate } from '@/libs/dateUtils';
+import DeedComplete from '@/components/deeds/DeedComplete.vue';
 
 
 const authStore = useAuthStore();
@@ -155,7 +161,7 @@ const statusTranslations = {
     'DRAFT': 'DRAFT',
     'IN_PROGRESS': 'SEDANG PROSES',
     'WAITING_SIGNATURE': 'MENUNGGU TANDA TANGAN',
-    'COMPLETED': 'KOMPLIT',
+    'COMPLETED': 'KOMPLET',
     'REJECTED': 'DITOLAK'
 };
 

@@ -2,17 +2,17 @@
     <div>
         <!-- Header -->
         <div class="flex">
-            <h1 class="text-2xl font-bold mb-4 w-4/5">Daftar Akta</h1>
+            <h1 class="w-4/5 mb-4 text-2xl font-bold">Daftar Akta</h1>
             <div class="text-center">
                 <router-link to="/deeds/create"
-                    class="bg-blue-500 px-2 py-1 rounded-xl text-white font-semibold inline-block">Tambah
+                    class="inline-block px-2 py-1 font-semibold text-white bg-blue-500 rounded-xl">Tambah
                     Akta</router-link>
             </div>
         </div>
 
         <!-- Table -->
-        <div class=" bg-white px-6 py-8 rounded-lg shadow-md">
-            <table class="w-full table-auto mt-5">
+        <div class="px-6 py-8 bg-white rounded-lg shadow-md ">
+            <table class="w-full mt-5 table-auto">
                 <thead>
                     <tr>
                         <th class="px-4 py-2 border border-gray-300">No</th>
@@ -25,24 +25,28 @@
                 </thead>
                 <tbody>
                     <tr v-for="(akta, index) in aktas" :key="akta.id">
-                        <td class="px-4 py-2 border border-gray-300 text-center">{{ page * size + index + 1 }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">{{ page * size + index + 1 }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.number }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.deedType }}</td>
-                        <td class="px-4 py-2 border border-gray-300">{{ akta.deedDate }}</td>
+                        <td class="px-4 py-2 border border-gray-300">{{ formatDate(akta.deedDate) }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.deedStatus }}</td>
-                        <td class="px-4 py-2 border border-gray-300 text-center">
+                        <td class="px-4 py-2 text-center border border-gray-300">
                             <RouterLink :to="`/deeds/${akta.id}`" class="text-blue-500 hover:underline">Detail
                             </RouterLink>
+                            <button v-if="akta?.deedStatus === 'COMPLETED' && !akta?.invoice"
+                                @click="openInvoiceForm(akta)" class="px-4 py-2 duration-200 text-greeen-900">
+                                Buat Invoice
+                            </button>
                         </td>
                     </tr>
-                    <tr v-if="aktas.length === 0">
-                        <td colspan="5" class="text-center py-4 text-gray-500">Belum ada data akta</td>
+                    <tr v-if="aktas?.length === 0">
+                        <td colspan="5" class="py-4 text-center text-gray-500">Belum ada data akta</td>
                     </tr>
                 </tbody>
             </table>
 
             <!-- Pagination -->
-            <div class="flex justify-between items-center mt-4">
+            <div class="flex items-center justify-between mt-4">
                 <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="prevPage"
                     :disabled="page === 0">
                     &lt; Prev
@@ -54,18 +58,24 @@
                 </button>
             </div>
         </div>
+        <InvoiceFormModal :show="showModal" :deedId="deedSelected" :onClose="() => (showModal = false)"
+            @saved="fetchDeeds" />
     </div>
 </template>
 
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
+import { formatDate } from '../libs/dateUtils'
+import InvoiceFormModal from '@/components/invoices/InvoiceFormModal.vue';
 
-const aktas = ref<any[]>([])
+const aktas = ref()
 const page = ref(0)
 const size = 10
+const showModal = ref(false);
 const totalPages = ref(1)
+const deedSelected = ref()
 
 const fetchDeeds = async () => {
     const res = await api.get('/deeds', {
@@ -73,6 +83,15 @@ const fetchDeeds = async () => {
     })
     aktas.value = res.data.content
     totalPages.value = res.data.totalPages
+}
+
+// const fetchDeeds = (deed) => {
+//     deed.value = deed
+// }
+
+const openInvoiceForm = (akta) => {
+    deedSelected.value = akta
+    showModal.value = true
 }
 
 const prevPage = () => {
