@@ -5,10 +5,9 @@ import { useAuthStore } from '@/stores/authStore'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
 console.log(" env yang keluar ", import.meta.env.VITE_API_BASE_URL)
-console.log(" Api base URL ", API_BASE_URL)
 const api = axios.create({
   
-  baseURL: API_BASE_URL + '/api',
+  baseURL: '/api',
   withCredentials: true
 })
 
