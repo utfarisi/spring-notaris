@@ -1,7 +1,6 @@
 <template>
     <div>
         <h1 class="mb-4 text-xl font-bold">Daftar Invoice</h1>
-        <div v-if="invoice?.empty">Belum ada invoice</div>
 
         <div class="p-6 overflow-x-auto bg-white rounded-md shadow-md ">
             <table class="w-full mt-5 border border-gray-300 table-auto">
@@ -25,8 +24,23 @@
                             <router-link class="text-blue-600" :to="`/invoices/${inv.id}`">Lihat</router-link>
                         </td>
                     </tr>
+                    <tr v-if="invoice?.empty">
+                        <td colspan="5" class="py-4 text-center text-gray-500">Belum ada data invoice</td>
+                    </tr>
                 </tbody>
             </table>
+
+            <div class="flex items-center justify-between mt-4" v-if="!invoice?.empty">
+                <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="prevPage"
+                    :disabled="page === 0">
+                    &lt; Prev
+                </button>
+                <span>Halaman {{ page + 1 }} dari {{ totalPages }}</span>
+                <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="nextPage"
+                    :disabled="page + 1 >= totalPages">
+                    Next &gt;
+                </button>
+            </div>
         </div>
     </div>
 </template>

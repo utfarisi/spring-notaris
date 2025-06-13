@@ -44,7 +44,8 @@
                 </div>
             </div>
             <UploadDokumenModal v-if="selectedDeed !== null" :show="showUploadModal" :deed="selectedDeed"
-                :onClose="() => { showUploadModal = false; selectedDeed = null }" />
+                @close="() => { showUploadModal = false; selectedDeed = null }"
+                @document-uploaded="handleDocumentUploaded" />
         </div>
         <InvoicePreview />
     </div>
@@ -75,20 +76,31 @@ const translateStatus = (status) => {
 };
 
 const isAllDocsUploadedAndApproved = (deed) => {
-    const requiredDocs = requiredDocumentsMap[deed.deedType] || []
-    const uploadedDocs = deed.deedDocs || []
+    // Tambahkan guard clause jika deed atau deed.deedType tidak ada
+    if (!deed || !deed.deedType) {
+        return false;
+    }
 
-    // Buat map dari dokumen yang sudah di-upload (dengan status APPROVED)
-    const approvedDocTypes = uploadedDocs
-        .filter(doc => doc.status !== 'REJECTED')
-        .map(doc => doc.docType)
+    const allRequired = requiredDocumentsMap[deed.deedType] || [];
+    const uploadedDeedDocs = deed.deedDocs || []; // Menggunakan nama yang lebih jelas
 
-    // Cek apakah semua required docs ada di approvedDocTypes
-    return requiredDocs.every(requiredDoc => approvedDocTypes.includes(requiredDoc))
-}
+    // Jika tidak ada dokumen yang wajib, anggap sudah lengkap
+    if (allRequired.length === 0) {
+        return true;
+    }
+
+    // Buat Set dari jenis dokumen yang sudah di-upload dan statusnya bukan 'REJECTED'
+    const uploadedAndAcceptedDocTypes = new Set(
+        uploadedDeedDocs
+            .filter(doc => doc.status !== 'REJECTED')
+            .map(doc => doc.docType)
+    );
+
+    // Cek apakah semua required docs ada di uploadedAndAcceptedDocTypes
+    return allRequired.every(requiredDoc => uploadedAndAcceptedDocTypes.has(requiredDoc));
+};
 
 const openUploadModal = (deed) => {
-    console.log(" deed type ", deed.deedType)
     selectedDeed.value = deed
     showUploadModal.value = true
 }
@@ -110,6 +122,31 @@ onMounted(async () => {
         loading.value = false
     }
 })
+
+const handleDocumentUploaded = async (deedId) => {
+    try {
+        // 1. Fetch data akta yang diunggah secara spesifik
+        const res = await api.get(`/deeds/${deedId}/status-history`); // Asumsi ada endpoint untuk fetch 1 akta
+        const updatedDeed = res.data;
+
+        // 2. Temukan indeks akta yang diperbarui dalam array 'deeds'
+        const index = deeds.value.findIndex(d => d.id === deedId);
+
+        if (index !== -1) {
+            // 3. Ganti objek akta lama dengan objek akta yang baru diperbarui
+            // Ini memastikan Vue mendeteksi perubahan dan mere-render komponen
+            deeds.value[index] = updatedDeed;
+        } else {
+            // Jika tidak ditemukan (kasus jarang), muat ulang semua akta sebagai fallback
+            console.warn(`Akta dengan ID ${deedId} tidak ditemukan di array. Memuat ulang semua akta.`);
+            await fetchDeeds();
+        }
+    } catch (error) {
+        console.error('Gagal memperbarui akta setelah unggah dokumen:', error);
+        // Jika ada masalah saat memperbarui satu akta, fallback ke memuat ulang semua
+        await fetchDeeds();
+    }
+};
 
 const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('id-ID', {

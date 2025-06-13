@@ -25,7 +25,7 @@ public record InvoiceWithoutDeedResponse(
 
     public static InvoiceWithoutDeedResponse fromEntity(Invoice invoice) {
 
-        CustomerRecord customer = CustomerRecord.fromEntity(invoice.getCustomer());
+        CustomerRecord customer = invoice.getCustomer() == null ? null : CustomerRecord.fromEntity(invoice.getCustomer());
 
         List<InvoiceItemWithoutInvoiceResponse> items = invoice.getItems()
                 .stream()
