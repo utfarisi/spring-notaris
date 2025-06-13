@@ -6,14 +6,14 @@
 
       <form @submit.prevent="handleLogin">
         <div class="mb-5">
-          <label for="username" class="block mb-2 text-sm font-medium text-gray-700">Username</label>
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-700">Akun Pengguna</label>
           <input v-model="username" type="text" id="username"
             class="w-full p-3 transition duration-200 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required aria-label="Username" />
         </div>
 
         <div class="mb-6">
-          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Sandi</label>
           <input v-model="password" type="password" id="password"
             class="w-full p-3 transition duration-200 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required aria-label="Password" />
@@ -30,7 +30,8 @@
 
         <div class="mt-6 text-center text-gray-600">
           Belum punya akun?
-          <router-link to="/register" class="font-medium text-blue-600 hover:underline">Registrasi di sini</router-link>
+          <router-link to="/register" class="font-medium text-blue-600 hover:underline">Klik di sini untuk
+            mendaftar</router-link>
         </div>
       </form>
     </div>

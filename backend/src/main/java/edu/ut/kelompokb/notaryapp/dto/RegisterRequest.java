@@ -7,6 +7,8 @@ public record RegisterRequest(
         String username,
         @NotBlank(message = "Sandi tidak boleh kosong!")
         String password,
+        @NotBlank(message = "Konfirmasi password tidak boleh kosong")
+        String confirmPassword,
         @NotBlank(message = "Email tidak boleh kosong!")
         String email,
         @NotBlank(message = "NIK tidak boleh kosong!")
