@@ -1,24 +1,37 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen">
-    <div class="w-full max-w-lg p-8 bg-white rounded shadow-md">
-      <h2 class="mb-4 text-2xl font-semibold text-center">Login</h2>
+  <div class="flex flex-col items-center justify-center">
+    <div class="w-full">
+      <h2 class="mb-6 text-3xl font-bold text-center text-gray-800">Selamat Datang</h2>
+      <p class="mb-8 text-center text-gray-600">Silakan masuk ke akun Anda</p>
+
       <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label class="block mb-1 text-sm font-medium">Username</label>
-          <input v-model="username" type="text" class="w-full p-2 border rounded" required />
+        <div class="mb-5">
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-700">Username</label>
+          <input v-model="username" type="text" id="username"
+            class="w-full p-3 transition duration-200 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            required aria-label="Username" />
         </div>
-        <div class="mb-4">
-          <label class="block mb-1 text-sm font-medium">Password</label>
-          <input v-model="password" type="password" class="w-full p-2 border rounded" required />
+
+        <div class="mb-6">
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+          <input v-model="password" type="password" id="password"
+            class="w-full p-3 transition duration-200 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            required aria-label="Password" />
         </div>
-        <div v-if="error" class="mb-2 text-sm text-red-500">{{ error }}</div>
-        <button type="submit" class="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">
+
+        <div v-if="error" class="p-3 mb-4 text-sm text-red-700 bg-red-100 rounded-md" role="alert">
+          {{ error }}
+        </div>
+
+        <button type="submit"
+          class="w-full px-5 py-3 text-lg font-semibold text-white transition duration-200 bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
           Login
         </button>
-        <span class="block text-center mt-4">
-          atau
-          <router-link to="/register" class="text-blue-600 hover:underline">Registrasi</router-link>
-        </span>
+
+        <div class="mt-6 text-center text-gray-600">
+          Belum punya akun?
+          <router-link to="/register" class="font-medium text-blue-600 hover:underline">Registrasi di sini</router-link>
+        </div>
       </form>
     </div>
   </div>
