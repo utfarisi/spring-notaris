@@ -111,8 +111,8 @@ const submitInvoice = async () => {
     }
 
     try {
+        console.log(" payload sebelum pengiriman ke endpoint ", payload)
         const res = await api.post('/invoices', payload)
-        console.log('Payload dikirim:', payload)
         payload = {
             deedId: props.deedId,
             invoiceDate: null,

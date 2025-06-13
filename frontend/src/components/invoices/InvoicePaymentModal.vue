@@ -3,20 +3,18 @@
         <div class="relative w-full max-w-md p-6 bg-white rounded">
             <h2 class="mb-4 text-xl font-bold">Pembayaran Invoice</h2>
             <p>No: {{ invoice.invoiceNumber }}</p>
-            <p>Total: Rp {{ formatCurrency(invoice.totalAmount) }}</p>
+            <p>Total: {{ formatCurrency(invoice.totalAmount) }}</p>
 
-            <!-- Metode Pembayaran -->
             <div class="mt-4">
                 <label class="block mb-1 font-medium">Metode Pembayaran:</label>
                 <select v-model="paymentMethod" class="input">
                     <option disabled value="">-- Pilih --</option>
                     <option value="CASH">Cash</option>
-                    <option value="TRANSFER">Transfer Bank</option>
+                    <option value="BANK_TRANSFER">Transfer Bank</option>
                 </select>
             </div>
 
-            <!-- Jika transfer -->
-            <div v-if="paymentMethod === 'TRANSFER'" class="mt-4">
+            <div v-if="paymentMethod === 'BANK_TRANSFER'" class="mt-4">
                 <label class="block mb-1 font-medium">Pilih Bank Tujuan:</label>
                 <div class="space-y-2">
                     <div v-for="bank in banks" :key="bank.code"
@@ -37,7 +35,10 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
+            <div v-if="paymentMethod === 'CASH'" class="mt-4">
+                <PaymentCash :invoice="invoice" />
+            </div>
+
             <div class="flex justify-end gap-2 mt-6">
                 <button @click="onClose" class="btn-secondary">Batal</button>
                 <button @click="submitPayment" class="btn-primary">Bayar</button>
@@ -50,12 +51,15 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '@/libs/utils'
+import PaymentCash from '@/components/invoices/PaymentCash.vue'
 
 const props = defineProps({
     invoice: Object,
 })
 const emit = defineEmits(['close', 'paid'])
+
+const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
 
 const paymentMethod = ref('')
 const selectedBank = ref('')
@@ -66,21 +70,23 @@ const banks = [
         code: 'BCA',
         name: 'Bank BCA',
         accountNumber: '1234567890',
-        logo: '/img/bca.png',
+        logo: backendBaseUrl.value + '/images/bsi-logo.png',
     },
     {
         code: 'MANDIRI',
         name: 'Bank Mandiri',
         accountNumber: '9876543210',
-        logo: '/img/mandiri.png',
+        logo: backendBaseUrl.value + '/images/bsi-logo.png',
     },
     {
         code: 'BSI',
         name: 'Bank Syariah Indonesia (BSI)',
         accountNumber: '5566778899',
-        logo: '/img/bsi.png',
+        logo: backendBaseUrl.value + '/images/bsi-logo.png',
     },
 ]
+
+
 
 const onClose = () => emit('close')
 
@@ -89,18 +95,22 @@ const handleFileUpload = (event) => {
 }
 
 const submitPayment = async () => {
-    if (paymentMethod.value === 'TRANSFER' && (!selectedBank.value || !file.value)) {
+    if (paymentMethod.value === 'BANK_TRANSFER' && (!selectedBank.value || !file.value)) {
         alert('Harap pilih bank dan upload bukti transfer.')
         return
     }
 
     const formData = new FormData()
     formData.append('paymentMethod', paymentMethod.value)
-    formData.append('bankCode', selectedBank.value)
-    if (file.value) formData.append('proof', file.value)
+    if (paymentMethod.value === "BANK_TRANSFER") {
+        if (file.value) formData.append('proof', file.value)
+        formData.append('bankCode', selectedBank.value)
+    }
 
     try {
-        await axios.post(`/api/invoices/${props.invoice.id}/pay`, formData)
+        await api.post(`/invoices/${props.invoice.id}/pay`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
         alert('Pembayaran berhasil dikirim.')
         emit('paid')
         onClose()
@@ -115,6 +125,8 @@ const formatCurrency = (val) =>
 </script>
 
 <style scoped>
+@import url('@/style.css');
+
 .input {
     @apply w-full p-2 border rounded;
 }

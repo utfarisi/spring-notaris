@@ -46,7 +46,7 @@ const invoice = ref()
 
 onMounted(async () => {
     const id = route.params.id
-    const res = await api.get(`/invoices/${route.params.id}`)
+    const res = await api.get(`/invoices/${route.params.id}/show`)
     console.log(" data ", res.data)
     invoice.value = res.data
 })

@@ -1,38 +1,38 @@
 <template>
-    <div class="p-6">
-        <h2 class="mb-4 text-xl font-bold">Invoice Saya</h2>
+    <div>
+        <h1 class="mb-4 text-xl font-bold">Daftar Invoice</h1>
         <div v-if="invoice?.empty">Belum ada invoice</div>
 
-        <table class="w-full border">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="p-2 text-left">Nomor</th>
-                    <th class="p-2 text-left">Tanggal</th>
-                    <th class="p-2 text-left">Total</th>
-                    <th class="p-2 text-left">Status</th>
-                    <th class="p-2 text-left">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="inv in invoice?.content" :key="inv.id" class="border-t">
-                    <td class="p-2">{{ inv.invoiceNumber }}</td>
-                    <td class="p-2">{{ formatDate(inv.invoiceDate) }}</td>
-                    <td class="p-2">Rp{{ inv.totalAmount.toLocaleString() }}</td>
-                    <td class="p-2">{{ inv.status }}</td>
-                    <td class="p-2">
-                        <button class="text-blue-600" @click="viewDetail(inv)">Lihat</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-
+        <div class="p-6 overflow-x-auto bg-white rounded-md shadow-md ">
+            <table class="w-full mt-5 border border-gray-300 table-auto">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 border border-gray-300">Nomor</th>
+                        <th class="px-4 py-2 border border-gray-300">Tanggal</th>
+                        <th class="px-4 py-2 border border-gray-300">Total</th>
+                        <th class="px-4 py-2 border border-gray-300">Status</th>
+                        <th class="px-4 py-2 border border-gray-300">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="inv in invoice?.content" :key="inv.id" class="border-t">
+                        <td class="px-4 py-2 text-center border border-gray-300">{{ inv.invoiceNumber }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">{{ formatDate(inv.invoiceDate) }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">Rp{{ inv.totalAmount.toLocaleString()
+                        }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">{{ inv.status }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">
+                            <router-link class="text-blue-600" :to="`/invoices/${inv.id}`">Lihat</router-link>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-
 import api from '@/libs/utils'
 
 const invoice = ref()

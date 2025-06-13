@@ -1,0 +1,95 @@
+<template>
+    <div class="max-w-3xl p-6 mx-auto bg-white rounded shadow">
+        <h1 class="mb-4 text-xl font-bold">Detail Pembayaran Invoice</h1>
+
+
+        <div class="mb-4">
+            <p><strong>Nomor Invoice:</strong> {{ invoice?.invoiceNumber }}</p>
+            <p><strong>Tanggal:</strong> {{ formatDate(invoice?.invoiceDate) }}</p>
+            <p><strong>Klien:</strong> {{ invoice?.customer?.fullname }}</p>
+            <p><strong>Total:</strong> {{ formatCurrency(invoice?.totalAmount) }}</p>
+        </div>
+
+
+        <div class="p-4 mb-6 bg-gray-100 rounded">
+            <p><strong>Metode Pembayaran:</strong>
+                <span class="uppercase">{{ invoice?.paymentMethod || 'Belum dipilih' }}</span>
+            </p>
+
+            <template v-if="invoice?.paymentMethod === 'BANK_TRANSFER'">
+                <p><strong>Bank:</strong> {{ invoice.bankCode }}</p>
+                <div class="mt-2">
+                    <p class="mb-1 font-medium">Bukti Transfer:</p>
+                    <a :href="invoice?.evident" target="_blank">
+                        <img :src="invoice.evident" alt="Bukti Transfer" class="w-64 border rounded" />
+                    </a>
+                </div>
+            </template>
+
+            <template v-if="invoice?.paymentMethod === 'CASH'">
+                <div class="mt-2 text-sm text-gray-700">
+                    <p>Pembayaran akan dilakukan langsung di kantor.</p>
+                </div>
+            </template>
+        </div>
+
+
+        <div class="flex items-center justify-between mt-6">
+            <div>
+                <p><strong>Status:</strong>
+                    <span :class="{
+                        'text-green-600 font-bold': invoice.status === 'PAID',
+                        'text-red-600 font-bold': invoice.status !== 'PAID'
+                    }">
+                        {{ invoice.status === 'PAID' ? 'Lunas' : 'Belum Dibayar' }}
+                    </span>
+                </p>
+            </div>
+
+            <div v-if="invoice.status !== 'PAID' && invoice.paymentMethod">
+                <button @click="markAsPaid" class="btn-primary">Tandai sebagai Lunas</button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '@/libs/utils'
+import { useRoute } from 'vue-router'
+import { formatDate } from '@/libs/dateUtils'
+
+const route = useRoute()
+const invoice = ref({})
+
+const fetchInvoice = async () => {
+    const { data } = await api.get(`/invoices/${route.params.id}/show`)
+    invoice.value = data
+}
+
+const markAsPaid = async () => {
+    if (!confirm('Tandai invoice ini sebagai lunas?')) return
+    try {
+        await api.post(`invoices/${invoice.value.id}/mark-paid`)
+        alert('Status pembayaran diperbarui.')
+        fetchInvoice()
+    } catch (e) {
+        alert('Gagal memperbarui status.')
+    }
+}
+
+onMounted(() => {
+    fetchInvoice()
+})
+
+const formatCurrency = val =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(val)
+</script>
+
+<style scoped>
+@import url('@/style.css');
+
+.btn-primary {
+    @apply px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700;
+}
+</style>
