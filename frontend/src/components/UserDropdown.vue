@@ -1,23 +1,23 @@
 <template>
     <div ref="dropdownRef" class="relative">
-        <button @click="toggle" class="flex items-center gap-2 px-4 py-2 rounded hover:bg-gray-100 transition">
+        <button @click="toggle" class="flex items-center gap-2 px-4 py-2 transition rounded hover:bg-gray-100">
             <span>{{ user?.username }}</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
         </button>
 
-        <div v-if="open" class="absolute right-0 mt-2 w-48 bg-white shadow-md rounded z-50">
-            <div class="px-4 py-2 border-b text-sm text-gray-700">
+        <div v-if="open" class="absolute right-0 z-50 w-48 mt-2 bg-white rounded shadow-md">
+            <div class="px-4 py-2 text-sm text-gray-700 border-b">
                 <div class="text-xs text-gray-500">{{ user?.role }}</div>
             </div>
             <RouterLink to="/profile" class="block px-4 py-2 hover:bg-gray-100">Profil</RouterLink>
-            <button @click="logout" class="w-full text-left px-4 py-2 hover:bg-gray-100">Keluar</button>
+            <button @click="logout" class="w-full px-4 py-2 text-left hover:bg-gray-100">Keluar</button>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
@@ -30,10 +30,10 @@ const user = authStore.user
 
 const toggle = () => (open.value = !open.value)
 
-const handleClickOutside = (event: MouseEvent) => {
+const handleClickOutside = (event) => {
     if (
         dropdownRef.value &&
-        !dropdownRef.value.contains(event.target as Node)
+        !dropdownRef.value.contains(event.target)
     ) {
         open.value = false
     }
