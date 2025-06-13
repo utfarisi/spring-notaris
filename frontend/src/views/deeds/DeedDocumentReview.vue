@@ -1,12 +1,12 @@
 <template>
-    <div class="max-w-3xl mx-auto p-6 bg-white rounded shadow">
+    <div class="max-w-3xl p-6 mx-auto bg-white rounded shadow">
 
 
 
-        <div class="flex gap-3 items-center mb-4">
-            <h2 class="text-2xl font-bold mb-4 w-4/5">Verifikasi Dokumen Akta</h2>
+        <div class="flex items-center gap-3 mb-4">
+            <h2 class="w-4/5 mb-4 text-2xl font-bold">Verifikasi Dokumen Akta</h2>
 
-            <router-link :to="`/deeds/${route.params.id}`" class="bg-black px-2 py-2 rounded-md text-white text-sm ">
+            <router-link :to="`/deeds/${route.params.id}`" class="px-2 py-2 text-sm text-white bg-black rounded-md ">
                 Kembali
             </router-link>
         </div>
@@ -18,9 +18,9 @@
             <p><strong>Tanggal:</strong> {{ deed.deedDate }}</p>
         </div>
 
-        <table class="w-full table-auto border">
+        <table class="w-full border table-auto">
             <thead>
-                <tr class="bg-gray-100 text-left">
+                <tr class="text-left bg-gray-100">
                     <th class="px-3 py-2">Nama Dokumen</th>
                     <th class="px-3 py-2">Status</th>
                     <th class="px-3 py-2">Image</th>
@@ -38,7 +38,7 @@
                     <td class="px-3 py-2">
                         <button @click="previewDocument(doc)" class="text-blue-600 underline">Lihat</button>
                     </td>
-                    <td class="px-3 py-2 flex space-x-2">
+                    <td class="flex px-3 py-2 space-x-2">
                         <a v-if="doc.fileUrl" :href="doc.fileUrl" target="_blank" class="text-blue-600 hover:underline">
                             Lihat
                         </a>
@@ -59,19 +59,19 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import PreviewDocument from '../../components/PreviewDocument.vue';
+import PreviewDocument from '@/components/PreviewDocument.vue';
 import api from '@/libs/utils'
 
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
 
 const route = useRoute()
 const deedId = route.params.id
 
-const deed = ref<any>({})
-const documents = ref<any[]>([])
+const deed = ref({})
+const documents = ref([])
 
 const previewUrl = ref('')
 
@@ -84,7 +84,7 @@ onMounted(async () => {
     documents.value = docRes.data
 })
 
-const verify = async (docId: BigInteger, status: string) => {
+const verify = async (docId, status) => {
     try {
         await api.put(`/deed-documents/${docId}/verify`, {
             status: status
@@ -98,13 +98,12 @@ const verify = async (docId: BigInteger, status: string) => {
     }
 }
 
-const previewDocument = (doc: any) => {
-    // Asumsikan backend Anda sudah bisa melayani file via URL tertentu
-    const fileUrl = `${backendBaseUrl}/${doc.name}` // sesuaikan dengan path public file di backend
+const previewDocument = (doc) => {
+    const fileUrl = `${backendBaseUrl.value}/${doc.name}`
     previewUrl.value = fileUrl
 }
 
-const statusBadge = (status: string) => {
+const statusBadge = (status) => {
     return {
         'APPROVED': 'text-green-600 font-semibold',
         'REJECTED': 'text-red-600 font-semibold',

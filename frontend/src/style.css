@@ -2,6 +2,16 @@
 @import "tailwindcss/utilities";
 @import "tailwindcss";
 
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background-color: lightyellow;
+  }
+}
+
 .input {
   @apply w-full border rounded mb-2 p-3;
 }

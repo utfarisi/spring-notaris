@@ -49,8 +49,8 @@ const routes = [
       {path:'deeds/:id',name:'DeedDetail',component:()=>import('@/views/deeds/DeedDetail.vue')},
       {
         path: '/invoices/:id',
-        name: 'InvoicePreview',
-        component: () => import('@/components/invoices/InvoicePreview.vue') // atau ke `pages/invoice/`
+        name: 'InvoiceDetailAdmin',
+        component: () => import('@/components/invoices/InvoicePaymentAdminView.vue') // atau ke `pages/invoice/`
       },
       {
         path:'/my-invoices',

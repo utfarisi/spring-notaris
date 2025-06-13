@@ -1,10 +1,3 @@
-// src/utils/dateUtils.js
-
-/**
- * Formats a date string into a localized, human-readable date string (e.g., "Senin, 10 Juni 2024").
- * @param {string} dateStr The date string to format (e.g., "2024-06-10T10:00:00Z" or "2024-06-10").
- * @returns {string} The formatted date string.
- */
 export const formatDate = (dateStr) => {
     if (!dateStr) {
         return '-'; // Or any default value you prefer for null/empty dates
