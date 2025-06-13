@@ -79,7 +79,7 @@ public class AuthController {
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
-                .secure(false) // set to true if using HTTPS
+                .secure(true) // set to true if using HTTPS
                 .path("/")
                 .maxAge(Duration.ofHours(10))
                 .sameSite("Strict") // atau "Lax"
