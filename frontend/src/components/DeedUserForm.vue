@@ -3,7 +3,7 @@
         <!-- Tipe Akta -->
         <div>
             <label class="block font-medium">Tipe Akta</label>
-            <select v-model="form.deed_type" class="form-select mt-1 w-full">
+            <select v-model="form.deed_type" class="w-full mt-1 form-select">
                 <option disabled value="">Pilih tipe akta</option>
                 <option v-for="(label, key) in tipeAktaOptions" :key="key" :value="key">
                     {{ label }}
@@ -15,7 +15,7 @@
         <!-- Judul Akta -->
         <div>
             <label class="block font-medium">Judul</label>
-            <input v-model="form.title" type="text" class="form-input mt-1 w-full"
+            <input v-model="form.title" type="text" class="w-full mt-1 form-input"
                 placeholder="Judul akta (misal: Akta Jual Beli)" />
             <span class="text-red-600" v-if="formError.title">{{ formError.title }}</span>
         </div>
@@ -23,25 +23,25 @@
         <!-- Tanggal Akta -->
         <div>
             <label class="block font-medium">Tanggal</label>
-            <input v-model="form.deed_date" type="date" class="form-input mt-1 w-full" />
+            <input v-model="form.deed_date" type="date" class="w-full mt-1 form-input" />
             <span class="text-red-600" v-if="formError.deed_date">{{ formError.deed_date }}</span>
         </div>
 
         <!-- Deskripsi -->
         <div>
             <label class="block font-medium">Deskripsi</label>
-            <textarea v-model="form.description" rows="4" class="form-textarea mt-1 w-full"
+            <textarea v-model="form.description" rows="4" class="w-full mt-1 form-textarea"
                 placeholder="Isi ringkas atau catatan akta..."></textarea>
         </div>
 
         <!-- Tombol Submit -->
         <div class="text-right">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
+            <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700">Simpan</button>
         </div>
     </form>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue'
 import api from '@/libs/utils'
 import { useAuthStore } from '../stores/authStore'
@@ -64,7 +64,7 @@ const formError = ref({
     description: ''
 })
 
-const tipeAktaOptions: Record<string, string> = {
+const tipeAktaOptions = {
     JUAL_BELI: 'Jual Beli',
     HAK_MILIK: 'Sertifikat Hak Milik',
     PERJANJIAN: 'Perjanjian',
@@ -86,7 +86,7 @@ const handleSubmit = async () => {
             description: ''
         }
 
-    } catch (err: any) {
+    } catch (err) {
         if (err && err.status === 400) {
             formError.value = err.response?.data
         }

@@ -27,40 +27,48 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import PreviewDocument from '@/components/PreviewDocument.vue';
 
-const backendBaseUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
 
-const props = defineProps<{
+const props = defineProps({
     documents: {
-        id: number
-        docType: string
-        name: string
-        status: string
-        filePath: string
-    }[]
-}>()
+        id: {
+            required: true
+        },
+        docType: {
+            required: true
+        },
+        name: {
+            required: true
+        },
+        status: {
+            required: true
+        },
+        filePath: {
+            required: true
+        }
+    }
+})
 
-const emit = defineEmits<{
-    (e: 'reupload', document: any): void
-}>()
+const emit = defineEmits(['reupload']);
 
 const previewUrl = ref('')
 
-const emitReupload = (doc: any) => {
+const emitReupload = (doc) => {
     emit('reupload', doc)
 }
 
-const previewDocument = (doc: any) => {
-    // Asumsikan backend Anda sudah bisa melayani file via URL tertentu
-    const fileUrl = `${backendBaseUrl}/${doc.name}` // sesuaikan dengan path public file di backend
+const previewDocument = (doc) => {
+
+    const fileUrl = `${backendBaseUrl.value}/${doc.name}`
     previewUrl.value = fileUrl
     console.log(" previewUrl ", previewUrl.value)
 }
 
-const statusClass = (status: string) => {
+const statusClass = (status) => {
     switch (status) {
         case 'APPROVED':
             return 'text-green-600 font-semibold'

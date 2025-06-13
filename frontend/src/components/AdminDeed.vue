@@ -1,6 +1,5 @@
 <template>
     <div>
-        <!-- Header -->
         <div class="flex">
             <h1 class="w-4/5 mb-4 text-2xl font-bold">Daftar Akta</h1>
             <div class="text-center">
@@ -58,7 +57,7 @@
                 </button>
             </div>
         </div>
-        <InvoiceFormModal :show="showModal" :deedId="deedSelected" :onClose="() => (showModal = false)"
+        <InvoiceFormModal :show="showModal" :deedId="deedSelected?.id" :onClose="() => (showModal = false)"
             @saved="fetchDeeds" />
     </div>
 </template>

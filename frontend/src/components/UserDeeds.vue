@@ -40,7 +40,7 @@
                         v-if="!isAllDocsUploadedAndApproved(deed)" @click="openUploadModal(deed)">
                         Unggah Dokumen
                     </button>
-                    <router-link :to="`/invoices/${deed.id}`">Lihat Invoice</router-link>
+                    <router-link :to="`/invoices/${deed?.id}`" v-if="deed?.invoice">Lihat Invoice</router-link>
                 </div>
             </div>
             <UploadDokumenModal v-if="selectedDeed !== null" :show="showUploadModal" :deed="selectedDeed"
@@ -50,19 +50,19 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 import UploadDokumenModal from '@/components/UploadDokumenModal.vue'
 import { useRouter } from 'vue-router'
-import { requiredDocumentsMap } from '../libs/requiredDocuments'
+import { requiredDocumentsMap } from '@/libs/requiredDocuments'
 
 
 const showUploadModal = ref(false)
 const selectedDeed = ref(null)
 const router = useRouter();
 
-const statusTranslations: { [key: string]: string } = {
+const statusTranslations = {
     'DRAFT': 'DRAFT',
     'IN_PROGRESS': 'SEDANG PROSES',
     'WAITING_SIGNATURE': 'MENUNGGU TANDA TANGAN',
@@ -70,11 +70,11 @@ const statusTranslations: { [key: string]: string } = {
     'REJECTED': 'DITOLAK'
 };
 
-const translateStatus = (status: string): string => {
+const translateStatus = (status) => {
     return statusTranslations[status] || status; // Mengembalikan status asli jika tidak ditemukan
 };
 
-const isAllDocsUploadedAndApproved = (deed: any): boolean => {
+const isAllDocsUploadedAndApproved = (deed) => {
     const requiredDocs = requiredDocumentsMap[deed.deedType] || []
     const uploadedDocs = deed.deedDocs || []
 
@@ -87,13 +87,13 @@ const isAllDocsUploadedAndApproved = (deed: any): boolean => {
     return requiredDocs.every(requiredDoc => approvedDocTypes.includes(requiredDoc))
 }
 
-const openUploadModal = (deed: any) => {
+const openUploadModal = (deed) => {
     console.log(" deed type ", deed.deedType)
     selectedDeed.value = deed
     showUploadModal.value = true
 }
 
-const showDetail = async (deed: any) => {
+const showDetail = async (deed) => {
     await router.push(`deeds/${deed.id}`)
 }
 
@@ -111,7 +111,7 @@ onMounted(async () => {
     }
 })
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('id-ID', {
         weekday: 'long',
         year: 'numeric',

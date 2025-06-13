@@ -3,66 +3,67 @@
         <template v-if="allDocumentsApproved(deed)">
             <div class="flex flex-col gap-3 mb-4">
                 <div class="flex flex-col">
-                    <label for="deedNumber" class="text-sm text-gray-600 mb-1">Nomor Akta:</label>
+                    <label for="deedNumber" class="mb-1 text-sm text-gray-600">Nomor Akta:</label>
                     <input type="number" id="deedNumber" v-model="deedNumberInput" placeholder="Masukkan Nomor Akta"
-                        class="border p-2 rounded w-full" :disabled="isProcessing" />
+                        class="w-full p-2 border rounded" :disabled="isProcessing" />
                 </div>
                 <div class="flex flex-col">
-                    <label for="processNote" class="text-sm text-gray-600 mb-1">Catatan Proses (opsional):</label>
+                    <label for="processNote" class="mb-1 text-sm text-gray-600">Catatan Proses (opsional):</label>
                     <textarea id="processNote" v-model="processNoteInput" placeholder="Catatan untuk proses (opsional)"
-                        class="border p-2 rounded w-full" rows="2" :disabled="isProcessing"></textarea>
+                        class="w-full p-2 border rounded" rows="2" :disabled="isProcessing"></textarea>
                 </div>
             </div>
         </template>
 
         <div class="flex items-center gap-2 mb-3">
-            <button @click="openRejectModal" class="bg-red-600 text-white px-4 py-2 rounded shrink-0">
+            <button @click="openRejectModal" class="px-4 py-2 text-white bg-red-600 rounded shrink-0">
                 Reject Akta
             </button>
 
             <template v-if="allDocumentsApproved(deed)">
-                <button @click="submitProcessStatus" class="bg-green-600 text-white px-4 py-2 rounded shrink-0"
+                <button @click="submitProcessStatus" class="px-4 py-2 text-white bg-green-600 rounded shrink-0"
                     :disabled="!deedNumberInput || isProcessing">
                     <span v-if="!isProcessing">Proses Akta</span>
                     <span v-else>Memproses...</span>
                 </button>
             </template>
-            <p v-else class="text-sm text-yellow-700 ml-2">
+            <p v-else class="ml-2 text-sm text-yellow-700">
                 Verifikasi semua dokumen untuk memproses akta.
             </p>
         </div>
 
-        <p v-if="processError" class="text-red-500 text-sm mt-1">{{ processError }}</p>
-        <p v-if="processSuccess" class="text-green-500 text-sm mt-1">{{ processSuccess }}</p>
+        <p v-if="processError" class="mt-1 text-sm text-red-500">{{ processError }}</p>
+        <p v-if="processSuccess" class="mt-1 text-sm text-green-500">{{ processSuccess }}</p>
 
         <div v-if="showRejectModal"
-            class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-                <h3 class="text-xl font-bold mb-4 text-gray-800">Tolak Akta</h3>
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-600 bg-opacity-50">
+            <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
+                <h3 class="mb-4 text-xl font-bold text-gray-800">Tolak Akta</h3>
                 <div class="mb-4">
-                    <label for="rejectNote" class="block text-gray-700 text-sm font-bold mb-2">Catatan Penolakan
+                    <label for="rejectNote" class="block mb-2 text-sm font-bold text-gray-700">Catatan Penolakan
                         (opsional):</label>
                     <textarea id="rejectNote" v-model="rejectNoteInput"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        class="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                         rows="3" placeholder="Cth: Dokumen KTP tidak jelas, mohon diunggah ulang."
                         :disabled="isProcessingReject"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3">
                     <button @click="cancelReject"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg"
+                        class="px-4 py-2 font-semibold text-gray-800 bg-gray-300 rounded-lg hover:bg-gray-400"
                         :disabled="isProcessingReject">
                         Batal
                     </button>
                     <button @click="confirmReject" :disabled="isProcessingReject"
-                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50">
+                        class="px-4 py-2 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50">
                         <span v-if="!isProcessingReject">Tolak</span>
                         <span v-else>Menolak...</span>
                     </button>
                 </div>
-                <p v-if="rejectError" class="text-red-500 text-sm mt-3">{{ rejectError }}</p>
-                <p v-if="rejectSuccess" class="text-green-500 text-sm mt-3">{{ rejectSuccess }}</p>
+                <p v-if="rejectError" class="mt-3 text-sm text-red-500">{{ rejectError }}</p>
+                <p v-if="rejectSuccess" class="mt-3 text-sm text-green-500">{{ rejectSuccess }}</p>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -182,6 +183,8 @@ const submitProcessStatus = async () => {
 </script>
 
 <style scoped>
+@import url('@/style.css');
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
