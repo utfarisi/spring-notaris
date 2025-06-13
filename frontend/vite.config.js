@@ -17,11 +17,6 @@ export default defineConfig({
         target: 'https://spring-notaris-production.up.railway.app',
         changeOrigin: true,
         secure:true,
-        configure: (proxy) => {
-          proxy.on('proxyReq', (proxyReq) => {
-            proxyReq.setHeader('Origin', 'http://localhost:5173');
-          });
-        },
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
