@@ -18,7 +18,7 @@
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv?.invoiceNumber }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ formatDate(inv.invoiceDate) }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">Rp{{ inv.totalAmount.toLocaleString()
-                            }}</td>
+                        }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv.status }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">
                             <router-link class="text-blue-600" :to="`/invoices/${inv.id}`">Lihat</router-link>
@@ -35,9 +35,9 @@
                     :disabled="page === 0">
                     &lt; Prev
                 </button>
-                <span>Halaman {{ page + 1 }} dari {{ totalPages }}</span>
+                <span>Halaman {{ page + 1 }} dari {{ invoice?.totalPages }}</span>
                 <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="nextPage"
-                    :disabled="page + 1 >= totalPages">
+                    :disabled="page + 1 >= invoice?.totalPages">
                     Next &gt;
                 </button>
             </div>
@@ -50,7 +50,7 @@ import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 
 const invoice = ref()
-
+const page = ref(0)
 const selectedInvoice = ref(null)
 
 onMounted(async () => {
@@ -60,6 +60,20 @@ onMounted(async () => {
 
 const viewDetail = (invoice) => {
     selectedInvoice.value = invoice
+}
+
+const prevPage = () => {
+    if (page.value > 0) {
+        page.value--
+        fetchDeeds()
+    }
+}
+
+const nextPage = () => {
+    if (page.value + 1 < totalPages.value) {
+        page.value++
+        fetchDeeds()
+    }
 }
 
 const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('id-ID')
