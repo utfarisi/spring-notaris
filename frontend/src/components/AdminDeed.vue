@@ -84,9 +84,6 @@ const fetchDeeds = async () => {
     totalPages.value = res.data.totalPages
 }
 
-// const fetchDeeds = (deed) => {
-//     deed.value = deed
-// }
 
 const openInvoiceForm = (akta) => {
     deedSelected.value = akta

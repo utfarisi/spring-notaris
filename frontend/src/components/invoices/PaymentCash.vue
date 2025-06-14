@@ -9,7 +9,6 @@
             <li><strong>Telp:</strong> (021) 12345678</li>
         </ul>
 
-        <!-- Ringkas dan beri scroll bila perlu -->
         <div class="mt-4 max-h-[200px] overflow-y-auto border-t pt-3">
             <CashPaymentReceipt :invoice="invoice" />
         </div>
@@ -17,8 +16,6 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-import api from '@/libs/utils'
 import CashPaymentReceipt from '@/components/invoices/CashPaymentReceipt.vue'
 
 const props = defineProps({
@@ -28,23 +25,9 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['paid'])
-
-const konfirmasiBayar = async () => {
-    try {
-        const form = new FormData()
-        form.append('paymentMethod', 'CASH')
-
-        await axios.post(`/invoices/${props.invoiceId}/pay`, form, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-
-        emit('paid') // Bisa reload invoice atau redirect ke halaman selesai
-    } catch (error) {
-        alert('Gagal menyimpan metode pembayaran. Silakan coba lagi.')
-        console.error(error)
-    }
-}
+// HAPUS emit('paid') dan fungsi konfirmasiBayar
+// const emit = defineEmits(['paid'])
+// const konfirmasiBayar = async () => { ... }
 </script>
 
 <style scoped>

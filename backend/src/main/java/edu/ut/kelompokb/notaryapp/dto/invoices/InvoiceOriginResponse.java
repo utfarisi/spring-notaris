@@ -21,7 +21,8 @@ public record InvoiceOriginResponse(
         PaymentMethod paymentMethod,
         String bankName,
         String description,
-        InvoiceStatus status
+        InvoiceStatus status,
+        String evident
         ) {
 
 }

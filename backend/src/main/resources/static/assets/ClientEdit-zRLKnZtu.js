@@ -1,0 +1,1 @@
+import{_ as t,c as o,a as s,o as n}from"./index-21rKffgS.js";const a={},r={class:"ml-65 max-w-8xl mx-auto p-6 bg-white rounded shadow"};function c(d,e){return n(),o("div",r,e[0]||(e[0]=[s("h3",null,"Edit CLient",-1)]))}const l=t(a,[["render",c]]);export{l as default};

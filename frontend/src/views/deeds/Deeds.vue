@@ -6,7 +6,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useAuthStore } from '@/stores/authStore'
 import UserDeeds from '@/components/UserDeeds.vue'
 import AdminDeed from '@/components/AdminDeed.vue'

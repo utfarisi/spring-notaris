@@ -204,7 +204,8 @@ public class InvoiceService {
                 invoice.getPaymentMethod(),
                 invoice.getBankName(),
                 invoice.getDescription(),
-                invoice.getStatus()
+                invoice.getStatus(),
+                invoice.getEvident()
         );
     }
 

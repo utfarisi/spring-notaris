@@ -93,6 +93,17 @@ const removeItem = (index) => {
     additionalCosts.value.splice(index, 1)
 }
 
+// Pindahkan resetForm ke sini agar bisa diakses
+const resetForm = () => {
+    invoiceDate.value = today // Atur kembali ke nilai default
+    dueDate.value = nextWeek // Atur kembali ke nilai default
+    transactionAmount.value = 0
+    serviceFeePercentage.value = 2.5 // Atur kembali ke nilai default
+    additionalCosts.value = [{ name: '', amount: 0 }] // Reset ke item awal
+    description.value = ''
+    // Subtotal, taxAmount, totalAmount akan terhitung otomatis karena computed
+}
+
 const submitInvoice = async () => {
     const filteredExtras = additionalCosts.value.filter(i => i.name && i.amount > 0)
 
@@ -111,40 +122,15 @@ const submitInvoice = async () => {
     }
 
     try {
-        console.log(" payload sebelum pengiriman ke endpoint ", payload)
+        console.log("Payload sebelum pengiriman ke endpoint:", payload) // Log yang lebih informatif
         const res = await api.post('/invoices', payload)
-        payload = {
-            deedId: props.deedId,
-            invoiceDate: null,
-            dueDate: null,
-            transactionAmount: transactionAmount.value,
-            feePercentage: serviceFeePercentage.value,
-            feeAmount: feeAmount.value,
-            additionalCosts: filteredExtras,
-            subtotal: subtotal.value,
-            taxAmount: taxAmount.value,
-            totalAmount: totalAmount.value,
-            description: description.value
-        }
+        alert('Invoice berhasil disimpan!') // Beri feedback ke pengguna
         resetForm()
         emit('saved', res.data);
-        props.onClose()
+        props.onClose() // Ini yang akan menutup modal
     } catch (err) {
-        console.error(err)
-        alert('Gagal menyimpan invoice.')
-    }
-
-    const resetForm = () => {
-        invoiceDate.value = null
-        dueDate.value = null
-        transactionAmount.value = 0
-        serviceFeePercentage.value = 0
-        feeAmount.value = 0
-        additionalCosts.value = []
-        subtotal.value = 0
-        taxAmount.value = 0
-        totalAmount.value = 0
-        description.value = ''
+        console.error("Error menyimpan invoice:", err) // Log error lebih detail
+        alert('Gagal menyimpan invoice. Silakan coba lagi.')
     }
 }
 </script>

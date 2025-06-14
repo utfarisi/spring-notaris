@@ -52,7 +52,7 @@
 <script setup>
 import { ref } from 'vue'
 import api from '@/libs/utils'
-import PaymentCash from '@/components/invoices/PaymentCash.vue'
+import PaymentCash from '@/components/invoices/PaymentCash.vue' // Pastikan path benar
 
 const props = defineProps({
     invoice: Object,
@@ -61,32 +61,15 @@ const emit = defineEmits(['close', 'paid'])
 
 const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
 
-const paymentMethod = ref('')
-const selectedBank = ref('')
-const file = ref(null)
+const paymentMethod = ref('') // Akan diisi 'CASH' atau 'BANK_TRANSFER'
+const selectedBank = ref('') // Hanya untuk BANK_TRANSFER
+const file = ref(null) // Hanya untuk BANK_TRANSFER
 
 const banks = [
-    {
-        code: 'BCA',
-        name: 'Bank BCA',
-        accountNumber: '1234567890',
-        logo: backendBaseUrl.value + '/images/bsi-logo.png',
-    },
-    {
-        code: 'MANDIRI',
-        name: 'Bank Mandiri',
-        accountNumber: '9876543210',
-        logo: backendBaseUrl.value + '/images/bsi-logo.png',
-    },
-    {
-        code: 'BSI',
-        name: 'Bank Syariah Indonesia (BSI)',
-        accountNumber: '5566778899',
-        logo: backendBaseUrl.value + '/images/bsi-logo.png',
-    },
-]
-
-
+    { code: 'BCA', name: 'Bank BCA', accountNumber: '1234567890', logo: backendBaseUrl.value + '/images/bca-logo.png' },
+    { code: 'MANDIRI', name: 'Bank Mandiri', accountNumber: '9876543210', logo: backendBaseUrl.value + '/images/bank-mandiri-logo.png' },
+    { code: 'BSI', name: 'Bank Syariah Indonesia (BSI)', accountNumber: '5566778899', logo: backendBaseUrl.value + '/images/bsi-logo.png' },
+];
 
 const onClose = () => emit('close')
 
@@ -95,28 +78,37 @@ const handleFileUpload = (event) => {
 }
 
 const submitPayment = async () => {
-    if (paymentMethod.value === 'BANK_TRANSFER' && (!selectedBank.value || !file.value)) {
-        alert('Harap pilih bank dan upload bukti transfer.')
+    // Validasi umum untuk metode pembayaran
+    if (!paymentMethod.value) {
+        alert('Harap pilih metode pembayaran.')
         return
     }
 
     const form = new FormData()
-    form.append('paymentMethod', selectedMethod.value)
-    if (selectedMethod.value === 'BANK_TRANSFER') {
+    form.append('paymentMethod', paymentMethod.value)
+
+    if (paymentMethod.value === 'BANK_TRANSFER') {
+        if (!selectedBank.value || !file.value) {
+            alert('Harap pilih bank dan upload bukti transfer.')
+            return
+        }
         form.append('bankCode', selectedBank.value)
-        form.append('proof', proofFile.value) // Pastikan proofFile tidak null
+        form.append('proof', file.value)
+    } else if (paymentMethod.value === 'CASH') {
+
     }
 
     try {
-        await api.post(`/invoices/${props.invoice.id}/pay`, formData, {
+        console.log("Payload yang dikirim (FormData):", Object.fromEntries(form.entries())); // Logging FormData
+        await api.post(`/invoices/${props.invoice.id}/pay`, form, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
         alert('Pembayaran berhasil dikirim.')
-        emit('paid')
-        onClose()
+        emit('paid') // Memberi tahu parent bahwa pembayaran berhasil
+        onClose() // Menutup modal
     } catch (e) {
-        console.error(e)
-        alert('Gagal melakukan pembayaran.')
+        console.error("Error saat mengirim pembayaran:", e.response ? e.response.data : e.message); // Log error lebih detail
+        alert('Gagal melakukan pembayaran. Silakan coba lagi.')
     }
 }
 

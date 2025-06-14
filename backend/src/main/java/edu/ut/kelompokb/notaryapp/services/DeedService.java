@@ -158,7 +158,6 @@ public class DeedService {
                 .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan!"));
 
         deed.setDeed_status(request.status());
-        deed.setNumber(request.numberInvoice());
 
         DeedStatusHistory statusHistory = new DeedStatusHistory();
 

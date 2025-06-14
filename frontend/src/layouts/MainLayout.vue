@@ -1,11 +1,11 @@
 <template>
-  <div class="flex min-h-screen bg-gray-100 text-gray-900">
+  <div class="flex min-h-screen text-gray-900 bg-gray-100">
 
     <Sidebar />
 
-    <div class="flex-1 flex flex-col">
+    <div class="flex flex-col flex-1">
       <!-- Topbar -->
-      <header class="bg-white shadow px-6 py-4 flex items-center justify-between">
+      <header class="flex items-center justify-between px-6 py-4 bg-white shadow">
         <h1 class="text-xl font-semibold"></h1>
         <UserDropdown />
       </header>
