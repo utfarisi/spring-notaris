@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.ut.kelompokb.notaryapp.entities.Role;
 import edu.ut.kelompokb.notaryapp.entities.User;
@@ -24,6 +25,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Transactional
     public User registerUser(String username, String email, String password) {
         User user = new User();
         user.setUsername(username);
@@ -50,10 +52,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
+    @jakarta.transaction.Transactional
     public void save(User user) {
         userRepository.save(user);
     }

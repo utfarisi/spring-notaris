@@ -84,6 +84,7 @@ public class DeedService {
         return deedRepo.findAll(pageable).map(DeedCompleteResponse::fromEntity);
     }
 
+    @Transactional
     public DeedResponse saveDeed(DeedUserRequest request) {
         Customer customer = customerRepository.findById(request.customer_id())
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
@@ -106,6 +107,7 @@ public class DeedService {
         return DeedResponse.fromEntity(deed);
     }
 
+    @Transactional
     public DeedResponse saveDeed(DeedRequest request) {
         Customer customer = customerRepository.findById(request.customer_id())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
@@ -200,6 +202,7 @@ public class DeedService {
         return deedRepo.findByNumber(deed_number);
     }
 
+    @Transactional
     public void updateDeed(DeedEditRequest request) {
 
         Deed deed = deedRepo.findById(request.id()).orElseThrow(() -> new ResourceNotFoundException("Akta dengan ID " + request.id() + " tidak ditemukan."));
@@ -220,6 +223,7 @@ public class DeedService {
         deedRepo.save(deed);
     }
 
+    @Transactional
     public DeedDocumentsResponse saveDocument(Long deedId, MultipartFile file, String docType, String username) throws IOException {
         User user = usrRepo.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -244,6 +248,7 @@ public class DeedService {
         return DeedDocumentsResponse.fromEntity(ddRepo.save(doc));
     }
 
+    @Transactional
     public void updateDeedDocumentStatus(Long deedId, String status) {
         ddRepo.findDeedDocumentsByDeedId(deedId);
     }

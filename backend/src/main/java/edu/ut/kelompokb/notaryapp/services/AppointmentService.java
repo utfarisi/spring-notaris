@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.ut.kelompokb.notaryapp.dto.appointments.AppointmentRequest;
 import edu.ut.kelompokb.notaryapp.dto.appointments.AppointmentResponse;
@@ -33,6 +34,7 @@ public class AppointmentService {
     @Autowired
     private UserRepository usrRepo;
 
+    @Transactional
     public Appointment save(AppointmentRequest request) {
         User user = usrRepo.findById(request.userId()).orElseThrow(() -> new RuntimeException(" Pengguna tidak ditemukan!"));
         Appointment appointment = new Appointment();
@@ -46,6 +48,7 @@ public class AppointmentService {
         return aptRepo.save(appointment);
     }
 
+    @Transactional
     public void save(Appointment appointment) {
         aptRepo.save(appointment);
     }

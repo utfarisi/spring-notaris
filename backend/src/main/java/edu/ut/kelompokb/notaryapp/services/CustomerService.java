@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.ut.kelompokb.notaryapp.dto.CustomerRecord;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
@@ -26,6 +27,7 @@ public class CustomerService {
         )).toList();
     }
 
+    @Transactional
     public void save(Customer customer) {
         custRepo.save(customer);
     }

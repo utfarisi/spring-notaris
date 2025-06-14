@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.ut.kelompokb.notaryapp.entities.Document;
@@ -31,6 +32,7 @@ public class DocumentService {
         this.usrSrv = usrSrv;
     }
 
+    @Transactional
     public Document saveDocument(MultipartFile file, String username) throws IOException {
         User user = usrSrv.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));

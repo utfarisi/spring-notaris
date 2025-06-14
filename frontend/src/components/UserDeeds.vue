@@ -10,7 +10,12 @@
             </div>
         </div>
 
-        <div v-if="loading" class="text-center text-gray-500">Memuat data akta...</div>
+
+        <div v-if="loading" class="py-4 text-center">
+            <span
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat daftar akta...</p>
+        </div>
         <div v-else-if="deeds.length === 0" class="text-gray-500">Belum ada akta.</div>
 
         <div v-else class="mt-4 space-y-4 bg-white">
@@ -27,7 +32,7 @@
                     <p class="mb-2 text-sm font-bold text-gray font-xl">
                         Status: <span class="px-2 py-1 text-white bg-green-700 rounded-sm">{{
                             translateStatus(deed.deedStatus)
-                            }}</span>
+                        }}</span>
                     </p>
                 </div>
 
