@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,9 +40,17 @@ public class AppointmentController {
     private AppointmentService aptSrv;
 
     @GetMapping
-    public ResponseEntity<Page<AppointmentResponse>> index(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> index(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(aptSrv.findAll(page, size));
+        try {
+            return ResponseEntity.ok(aptSrv.findAll(page, size));
+        } catch (Exception e) {
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Internal Error");
+            err.put("message", e.getMessage());
+            return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PostMapping

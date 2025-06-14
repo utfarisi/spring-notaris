@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import edu.ut.kelompokb.notaryapp.dto.DeedCompleteResponse;
 import edu.ut.kelompokb.notaryapp.dto.DeedEditRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
@@ -53,17 +52,39 @@ public class DeedController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<DeedResponse>> index(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> index(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<DeedResponse> response = deedSrv.getDeeds(page, size);
-        return ResponseEntity.ok(response);
+        try {
+            Page<DeedResponse> response = deedSrv.getDeeds(page, size);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + e.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @GetMapping("/my-deed")
-    public ResponseEntity<Page<DeedCompleteResponse>> indexCustomer(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<?> indexCustomer(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+
         Long userId = user.getUser().getCustomer().getId();
-        return ResponseEntity.ok(deedSrv.findDeedsAndSiblingByUser(userId, page, size));
+        try {
+            return ResponseEntity.ok(deedSrv.findDeedsAndSiblingByUser(userId, page, size));
+        } catch (ResourceNotFoundException ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Not Found");
+            errorBody.put("message", ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     @PostMapping
@@ -79,17 +100,36 @@ public class DeedController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeedResponse> edit(@PathVariable Long id) {
+    public ResponseEntity<DeedResponse> edit(@PathVariable("id") Long id) {
         DeedResponse deedResponse = deedSrv.findById(id)
                 .map(DeedResponse::fromEntity).orElseThrow(() -> new RuntimeException("Akta tidak ditemukan!"));
 
         return ResponseEntity.ok(deedResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody DeedEditRequest request) {
+    @GetMapping("/{id}/show")
+    public ResponseEntity<?> show(@PathVariable("id") Long id) {
+        try {
+            return ResponseEntity.ok(deedSrv.getDeedById(id));
+        } catch (ResourceNotFoundException e) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Resource not found");
+            errorBody.put("message", "Akta yang anda cari tidak ditemukan");
+            return new ResponseEntity<>(errorBody, HttpStatus.NOT_FOUND);
 
-        if (request.id() == null && !id.equals(request.id())) {
+        } catch (Exception e) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal server error");
+            errorBody.put("message", "Terjadi kendala silahkan dicoba beberapa saat lagi");
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @Valid @RequestBody DeedEditRequest request) {
+
+        if (!id.equals(request.id())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -98,7 +138,7 @@ public class DeedController {
     }
 
     @PutMapping("/{id}/number")
-    public ResponseEntity<?> updateNumber(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> updateNumber(@PathVariable("id") Long id, @RequestBody Map<String, Object> payload) {
         System.out.println(" id/number ");
         Object numberObj = payload.get("number");
 
@@ -119,12 +159,12 @@ public class DeedController {
     }
 
     @GetMapping("/{id}/documents")
-    public ResponseEntity<List<DeedDocumentsResponse>> allDocumentByDeedId(@PathVariable Long id) {
+    public ResponseEntity<List<DeedDocumentsResponse>> allDocumentByDeedId(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ddSrv.findDocumentByDeedId(id));
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody DeedStatusUpdateRequest request) {
+    public ResponseEntity<?> updateStatus(@PathVariable("id") Long id, @RequestBody DeedStatusUpdateRequest request) {
 
         Deed deed = deedSrv.findById(id)
                 .orElseThrow(() -> new RuntimeException("Deed not found"));
@@ -140,7 +180,7 @@ public class DeedController {
     }
 
     @PutMapping("/{id}/set-on-progress")
-    public ResponseEntity<?> onProgress(@PathVariable Long id, @RequestBody ProcessDeedRequest request) {
+    public ResponseEntity<?> onProgress(@PathVariable("id") Long id, @RequestBody ProcessDeedRequest request) {
 
         Deed deed = deedSrv.findById(id)
                 .orElseThrow(() -> new RuntimeException("Deed not found"));
@@ -188,8 +228,7 @@ public class DeedController {
     }
 
     @GetMapping("/{id}/status-history")
-    public ResponseEntity<?> getStatusHistory(@PathVariable Long id) {
-
+    public ResponseEntity<?> getStatusHistory(@PathVariable("id") Long id) {
         try {
             return ResponseEntity.ok(deedSrv.findByDeedIdOrderByUpdatedAtDesc(id));
         } catch (ResourceNotFoundException ex) {
@@ -206,7 +245,7 @@ public class DeedController {
     }
 
     @GetMapping("/{id}/required-documents")
-    public ResponseEntity<List<String>> getRequiredDocuments(@PathVariable Long id) {
+    public ResponseEntity<List<String>> getRequiredDocuments(@PathVariable("id") Long id) {
         Optional<Deed> deedOpt = deedSrv.findById(id);
         if (deedOpt.isEmpty()) {
             return ResponseEntity.notFound().build();

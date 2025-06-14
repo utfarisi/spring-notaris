@@ -19,7 +19,7 @@ public class StorageService {
             if (!Files.exists(root)) {
                 Files.createDirectories(root);
             }
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String filename = UUID.randomUUID() + "_invoice_" + file.getOriginalFilename();
             Files.copy(file.getInputStream(), root.resolve(filename));
             return filename;
         } catch (IOException e) {

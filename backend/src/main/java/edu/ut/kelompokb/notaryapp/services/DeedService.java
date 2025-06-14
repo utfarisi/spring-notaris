@@ -29,7 +29,10 @@ import edu.ut.kelompokb.notaryapp.dto.DeedStatusUpdateRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedUserRequest;
 import edu.ut.kelompokb.notaryapp.dto.DeedWithStatusHistoriesRecord;
 import edu.ut.kelompokb.notaryapp.dto.ProcessDeedRequest;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentOriginResponse;
 import edu.ut.kelompokb.notaryapp.dto.deeds.DeedDocumentsResponse;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedOnlyWithDocument;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedOriginResponse;
 import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
 import edu.ut.kelompokb.notaryapp.dto.invoices.InvoiceWithoutDeedResponse;
 import edu.ut.kelompokb.notaryapp.entities.Customer;
@@ -68,9 +71,24 @@ public class DeedService {
         this.ddRepo = ddRepo;
     }
 
+    @Transactional
     public Page<DeedResponse> getDeeds(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return deedRepo.findAll(pageable).map(DeedResponse::fromEntity);
+        return deedRepo.findAll(pageable).map(deed -> {
+            InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+
+            return new DeedResponse(
+                    deed.getId(),
+                    deed.getCustomer().getId(),
+                    invoice,
+                    deed.getNumber(),
+                    deed.getDeedType(),
+                    deed.getTitle(),
+                    deed.getDescription(),
+                    deed.getDeed_status(),
+                    deed.getDeedDate()
+            );
+        });
     }
 
     public Page<DeedCompleteResponse> getDeedsAndSibling(int page, int size) {
@@ -128,6 +146,12 @@ public class DeedService {
         return deedRepo.findById(id);
     }
 
+    public DeedOriginResponse getDeedById(Long id) {
+        Deed deed = deedRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan!"));
+        return DeedOriginResponse.fromEntity(deed);
+    }
+
     @Transactional
     public DeedWithStatusHistoriesRecord updateStatus(Long id, DeedStatusUpdateRequest request) {
         Deed deed = deedRepo.findById(id)
@@ -181,15 +205,67 @@ public class DeedService {
                 .map(DeedResponse::fromEntity);
     }
 
+    @Transactional
     public Page<DeedCompleteResponse> findDeedsAndSiblingByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("deedDate").descending());
         return deedRepo.findByCustomerIdWithDetails(userId, pageable)
-                .map(DeedCompleteResponse::fromEntity);
+                .map(deed -> {
+                    // Semua akses ke lazy collections di sini akan aman karena @Transactional
+                    Set<DeedDocumentsResponse> deedDocs = deed.getDocuments()
+                            .stream()
+                            .map(DeedDocumentsResponse::fromEntity)
+                            .collect(Collectors.toSet());
+                    List<StatusHistoryRecord> listShr = deed.getStatusHistories()
+                            .stream()
+                            .map(StatusHistoryRecord::fromEntity)
+                            .toList();
+
+                    InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+
+                    return new DeedCompleteResponse(
+                            deed.getId(),
+                            deed.getCustomer().getId(),
+                            deed.getNumber(),
+                            deed.getDeedType(),
+                            deed.getTitle(),
+                            deed.getDescription(),
+                            deed.getDeed_status(),
+                            deed.getDeedDate(),
+                            deedDocs,
+                            listShr,
+                            invoice
+                    );
+                });
     }
 
+    @Transactional
     public DeedCompleteResponse findByDeedIdOrderByUpdatedAtDesc(Long id) {
-        Deed deed = deedRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException(" Akta tidak ditemukan"));
-        return DeedCompleteResponse.fromEntity(deed);
+        Deed deed = deedRepo.findDeedById(id).orElseThrow(() -> new ResourceNotFoundException(" Akta tidak ditemukan"));
+        Set<DeedDocumentsResponse> deedDocs = deed.getDocuments()
+                .stream()
+                .map(DeedDocumentsResponse::fromEntity)
+                .collect(Collectors.toSet());
+        List<StatusHistoryRecord> listShr = deed.getStatusHistories()
+                .stream()
+                .map(dsh -> {
+                    return new StatusHistoryRecord(dsh.getStatus(), dsh.getUpdatedAt(), dsh.getNote());
+                })
+                .toList();
+
+        InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+        return new DeedCompleteResponse(
+                deed.getId(),
+                deed.getCustomer().getId(),
+                deed.getNumber(),
+                deed.getDeedType(),
+                deed.getTitle(),
+                deed.getDescription(),
+                deed.getDeed_status(),
+                deed.getDeedDate(),
+                deedDocs,
+                listShr,
+                invoice
+        );
     }
 
     public Optional<Deed> findByDeedNumber(String deed_number) {
@@ -249,33 +325,33 @@ public class DeedService {
         return deedRepo.countByStatus(status);
     }
 
-    public DeedCompleteResponse currentDeed(Long customerId) {
-        Deed deed = deedRepo.findTopByCustomerIdOrderByCreatedAt(customerId)
+    @Transactional
+    public DeedOnlyWithDocument currentDeed(Long customerId) {
+        Deed deed = deedRepo.findTopByCustomerIdOrderByDeedDate(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("belum ada akta pada user ini"));
 
-        System.out.println(" apakah ini jalan ");
-        List<StatusHistoryRecord> shr = deed.getStatusHistories().stream()
-                .map(StatusHistoryRecord::fromEntity)
-                .toList();
-
-        Set<DeedDocumentsResponse> ddr = deed.getDocuments()
+        Set<DeedDocumentOriginResponse> ddr = deed.getDocuments()
                 .stream()
-                .map(DeedDocumentsResponse::fromEntity)
+                .map(dd -> new DeedDocumentOriginResponse(
+                dd.getId(),
+                dd.getDocType(),
+                dd.getName(),
+                dd.getStatus(),
+                dd.getFilePath()
+        ))
                 .collect(Collectors.toSet());
-        InvoiceWithoutDeedResponse invoice = InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
 
-        DeedCompleteResponse dcr = new DeedCompleteResponse(
+        DeedOnlyWithDocument dcr = new DeedOnlyWithDocument(
                 deed.getId(),
                 deed.getCustomer().getId(),
+                deed.getCustomer().getFullname(),
                 deed.getNumber(),
                 deed.getDeedType(),
                 deed.getTitle(),
                 deed.getDescription(),
-                deed.getDeed_status(),
                 deed.getDeedDate(),
-                ddr,
-                shr,
-                invoice
+                deed.getDeed_status(),
+                ddr
         );
         return dcr;
     }

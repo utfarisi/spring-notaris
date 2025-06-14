@@ -100,11 +100,11 @@ const submitPayment = async () => {
         return
     }
 
-    const formData = new FormData()
-    formData.append('paymentMethod', paymentMethod.value)
-    if (paymentMethod.value === "BANK_TRANSFER") {
-        if (file.value) formData.append('proof', file.value)
-        formData.append('bankCode', selectedBank.value)
+    const form = new FormData()
+    form.append('paymentMethod', selectedMethod.value)
+    if (selectedMethod.value === 'BANK_TRANSFER') {
+        form.append('bankCode', selectedBank.value)
+        form.append('proof', proofFile.value) // Pastikan proofFile tidak null
     }
 
     try {

@@ -7,6 +7,7 @@ import java.util.List;
 import edu.ut.kelompokb.notaryapp.dto.CustomerRecord;
 import edu.ut.kelompokb.notaryapp.dto.DeedResponse;
 import edu.ut.kelompokb.notaryapp.entities.Invoice;
+import edu.ut.kelompokb.notaryapp.etc.InvoiceStatus;
 import edu.ut.kelompokb.notaryapp.etc.PaymentMethod;
 
 public record InvoiceResponse(
@@ -22,7 +23,8 @@ public record InvoiceResponse(
         BigDecimal totalAmount,
         PaymentMethod paymentMethod,
         String bankName,
-        String description
+        String description,
+        InvoiceStatus status
         ) {
 
     public static InvoiceResponse fromEntity(Invoice inv) {
@@ -44,7 +46,8 @@ public record InvoiceResponse(
                 inv.getTotalAmount(),
                 inv.getPaymentMethod(),
                 inv.getBankName(),
-                inv.getDescription()
+                inv.getDescription(),
+                inv.getStatus()
         );
     }
 }

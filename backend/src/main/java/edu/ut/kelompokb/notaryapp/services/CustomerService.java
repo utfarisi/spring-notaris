@@ -33,7 +33,7 @@ public class CustomerService {
     }
 
     public Page<CustomerRecord> getCustomerByUserRole(String rolename, Pageable page) {
-        Page<Customer> customerPages = custRepo.findByUserRoleName(rolename, page);
+        Page<Customer> customerPages = custRepo.findByUserRoleNameWithUser(rolename, page);
 
         return customerPages
                 .map(c -> new CustomerRecord(
@@ -41,7 +41,7 @@ public class CustomerService {
                 c.getNip(),
                 c.getFirstName(),
                 c.getLastName(),
-                c.getFirstName() + " " + c.getLastName(),
+                c.getFullname(),
                 c.getPhone(),
                 c.getAddress(),
                 c.getUser().getUsername(),
@@ -49,7 +49,7 @@ public class CustomerService {
     }
 
     public CustomerRecord findById(Long id) {
-        Customer customer = custRepo.findById(id).orElseThrow(() -> new RuntimeException("Client tidak ditemukan!"));
+        Customer customer = custRepo.findCustomerById(id).orElseThrow(() -> new RuntimeException("Client tidak ditemukan!"));
         return new CustomerRecord(customer.getId(), customer.getNip(), customer.getFirstName(), customer.getLastName(), customer.getFirstName() + " " + customer.getLastName(), customer.getPhone(), customer.getAddress(), customer.getUser().getUsername(), customer.getUser().getEmail());
     }
 }

@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.BatchSize;
+
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -57,10 +59,12 @@ public class Deed {
     @OneToOne(mappedBy = "deed", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "deed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 25)
     private List<DeedStatusHistory> statusHistories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "deed", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "deed", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 25)
     private Set<DeedDocument> documents = new HashSet<>();
 
     private LocalDateTime createdAt;

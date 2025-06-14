@@ -74,7 +74,7 @@ public class AppointmentService {
     public Page<AppointmentResponse> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("appointmentDate").descending());
 
-        return aptRepo.findAll(pageable).map(AppointmentResponse::fromEntity);
+        return aptRepo.getAppointmentsInPaging(pageable).map(AppointmentResponse::fromEntity);
     }
 
     public Page<AppointmentResponse> findAppointmentByUser(Long userId, int page, int size) {

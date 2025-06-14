@@ -21,7 +21,8 @@
                 <div class="mt-2">
                     <p class="mb-1 font-medium">Bukti Transfer:</p>
                     <a :href="invoice?.evident" target="_blank">
-                        <img :src="invoice.evident" alt="Bukti Transfer" class="w-64 border rounded" />
+                        <img :src="backendBaseUrl + '/' + invoice.evident" alt="Bukti Transfer"
+                            class="w-64 border rounded" />
                     </a>
                 </div>
             </template>
@@ -58,6 +59,8 @@ import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/libs/dateUtils'
+
+const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
 
 const route = useRoute()
 const invoice = ref({})

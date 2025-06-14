@@ -11,13 +11,12 @@ public record DeedDocumentResponse(
         String docType,
         String name,
         String status,
-        String filePath,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
         ) {
 
     public static DeedDocumentResponse fromEntity(DeedDocument dd) {
         DeedResponse deedResponse = DeedResponse.fromEntity(dd.getDeed());
-        return new DeedDocumentResponse(dd.getId(), deedResponse, dd.getDocType(), dd.getName(), dd.getStatus(), dd.getFilePath(), dd.getCreatedAt(), dd.getUpdatedAt());
+        return new DeedDocumentResponse(dd.getId(), deedResponse, dd.getDocType(), dd.getName(), dd.getStatus(), dd.getCreatedAt(), dd.getUpdatedAt());
     }
 }

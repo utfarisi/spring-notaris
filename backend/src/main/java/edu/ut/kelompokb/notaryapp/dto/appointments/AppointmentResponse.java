@@ -17,7 +17,11 @@ public record AppointmentResponse(
         CustomerResponse customer) {
 
     public static AppointmentResponse fromEntity(Appointment appointment) {
-        CustomerResponse customerResponse = CustomerResponse.fromEntity(appointment.getUser().getCustomer());
+        CustomerResponse customerResponse = null;
+        if (appointment.getUser() != null) {
+
+            customerResponse = appointment.getUser().getCustomer() == null ? null : CustomerResponse.fromEntity(appointment.getUser().getCustomer());
+        }
 
         return new AppointmentResponse(
                 appointment.getId(),

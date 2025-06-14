@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.ut.kelompokb.notaryapp.dto.DeedCompleteResponse;
+import edu.ut.kelompokb.notaryapp.dto.deeds.DeedOnlyWithDocument;
 import edu.ut.kelompokb.notaryapp.exceptions.ResourceNotFoundException;
 import edu.ut.kelompokb.notaryapp.security.CustomUserDetails;
 import edu.ut.kelompokb.notaryapp.services.DeedService;
@@ -36,7 +36,7 @@ public class UserDashboard {
     public ResponseEntity<?> indexCustomer(@AuthenticationPrincipal CustomUserDetails user) {
         Long userId = user.getUser().getCustomer().getId();
         try {
-            DeedCompleteResponse response = deedSrv.currentDeed(userId);
+            DeedOnlyWithDocument response = deedSrv.currentDeed(userId);
             logger.info("Deed found and returned successfully.");
             return ResponseEntity.ok(response);
         } catch (ResourceNotFoundException ex) {

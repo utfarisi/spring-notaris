@@ -1,15 +1,13 @@
 package edu.ut.kelompokb.notaryapp.security;
 
-import edu.ut.kelompokb.notaryapp.entities.Authority;
-import edu.ut.kelompokb.notaryapp.entities.Role;
-import edu.ut.kelompokb.notaryapp.entities.User;
+import java.util.Collection;
+import java.util.Set;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import edu.ut.kelompokb.notaryapp.entities.User;
 
 public class CustomUserDetails implements UserDetails {
 

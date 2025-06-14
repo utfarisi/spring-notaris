@@ -18,16 +18,23 @@ public interface DeedRepository extends JpaRepository<Deed, Long> {
     @Query("SELECT d FROM Deed d LEFT JOIN FETCH d.statusHistories LEFT JOIN FETCH d.documents LEFT JOIN FETCH d.invoice")
     Page<Deed> findAllWithDetails(Pageable pageable);
 
-    // Untuk findDeedsAndSiblingByUser
-    @Query("SELECT d FROM Deed d LEFT JOIN FETCH d.statusHistories LEFT JOIN FETCH d.documents LEFT JOIN FETCH d.invoice WHERE d.customer.id = :customerId")
+    @Query("SELECT d FROM Deed d LEFT JOIN FETCH d.customer LEFT JOIN FETCH d.invoice  WHERE d.customer.id = :customerId")
     Page<Deed> findByCustomerIdWithDetails(@Param("customerId") Long customerId, Pageable pageable);
 
-    // Untuk currentDeed
-    @Query("SELECT d FROM Deed d LEFT JOIN FETCH d.statusHistories LEFT JOIN FETCH d.documents LEFT JOIN FETCH d.invoice WHERE d.customer.id = :customerId ORDER BY d.createdAt DESC")
+    @Query("SELECT d FROM Deed d  LEFT JOIN FETCH d.invoice WHERE d.customer.id = :customerId ORDER BY d.createdAt DESC")
     Optional<Deed> findTopByCustomerIdOrderByCreatedAtWithDetails(@Param("customerId") Long customerId);
 
     @Query("SELECT count(d.deed_status) from Deed d where d.deed_status=:status")
     public Integer countByStatus(DeedStatus status);
 
-    public Optional<Deed> findTopByCustomerIdOrderByCreatedAt(Long customerId);
+    @Query("SELECT d FROM Deed d "
+            + "LEFT JOIN FETCH d.customer "
+            + "LEFT JOIN FETCH d.invoice "
+            + "WHERE d.customer.id = :customerId "
+            + "ORDER BY d.deedDate DESC "
+            + "LIMIT 1")
+    public Optional<Deed> findTopByCustomerIdOrderByDeedDate(@Param("customerId") Long customerId);
+
+    @Query("SELECT d from Deed d LEFT JOIN FETCH d.statusHistories LEFT JOIN FETCH d.documents LEFT JOIN FETCH d.invoice  WHERE d.id=:id")
+    public Optional<Deed> findDeedById(@Param("id") Long id);
 }

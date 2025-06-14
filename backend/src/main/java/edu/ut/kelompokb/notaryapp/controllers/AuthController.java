@@ -1,11 +1,13 @@
 package edu.ut.kelompokb.notaryapp.controllers;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -68,70 +70,86 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
-        Optional<User> userOptional = userService.findByUsername(request.getUsername());
+        try {
+            Optional<User> userOptional = userService.findByUsername(request.getUsername());
 
-        if (userOptional.isEmpty()
-                || !passwordEncoder.matches(request.getPassword(), userOptional.get().getPassword())) {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            if (userOptional.isEmpty()
+                    || !passwordEncoder.matches(request.getPassword(), userOptional.get().getPassword())) {
+                return ResponseEntity.status(401).body("Invalid credentials");
+            }
+
+            String token = jwtService.generateToken(userOptional.get().getUsername());
+
+            ResponseCookie cookie = ResponseCookie.from("token", token)
+                    .httpOnly(true)
+                    .secure(true) // set to true if using HTTPS
+                    .path("/")
+                    .maxAge(Duration.ofHours(10))
+                    .sameSite("Strict") // atau "Lax"
+                    .build();
+
+            response.addHeader("Set-Cookie", cookie.toString());
+
+            return ResponseEntity.ok().body(new AuthResponse(token));
+        } catch (Exception ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        String token = jwtService.generateToken(userOptional.get().getUsername());
-
-        ResponseCookie cookie = ResponseCookie.from("token", token)
-                .httpOnly(true)
-                .secure(true) // set to true if using HTTPS
-                .path("/")
-                .maxAge(Duration.ofHours(10))
-                .sameSite("Strict") // atau "Lax"
-                .build();
-
-        response.addHeader("Set-Cookie", cookie.toString());
-
-        return ResponseEntity.ok().body(new AuthResponse(token));
     }
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
-        }
 
-        var userOpt = userService.findByUsername(userDetails.getUsername());
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(404).body("User not found");
-        }
+        try {
+            if (userDetails == null) {
+                return ResponseEntity.status(401).body("Unauthorized");
+            }
 
-        var currentUser = userOpt.get();
+            var userOpt = userService.findByUsername(userDetails.getUsername());
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(404).body("User not found");
+            }
 
-        List<String> authorities = userDetails.getAuthorities()
-                .stream()
-                .map(auth -> auth.getAuthority())
-                .toList();
+            var currentUser = userOpt.get();
 
-        if (currentUser.getRole().getName().equals("USER")) {
-            return ResponseEntity.ok(new UserResponse(
-                    currentUser.getId(),
-                    currentUser.getUsername(),
-                    currentUser.getRole().getName(),
-                    authorities,
-                    currentUser.getEmail(),
-                    currentUser.getCustomer().getId(),
-                    currentUser.getCustomer().getFirstName(),
-                    currentUser.getCustomer().getLastName(),
-                    currentUser.getCustomer().getAddress()
-            ));
-        } else {
-            return ResponseEntity.ok(new UserResponse(
-                    currentUser.getId(),
-                    currentUser.getUsername(),
-                    currentUser.getRole().getName(),
-                    authorities,
-                    "",
-                    null,
-                    "",
-                    "",
-                    ""
-            ));
+            List<String> authorities = userDetails.getAuthorities()
+                    .stream()
+                    .map(auth -> auth.getAuthority())
+                    .toList();
+
+            if (currentUser.getRole().getName().equals("USER")) {
+                return ResponseEntity.ok(new UserResponse(
+                        currentUser.getId(),
+                        currentUser.getUsername(),
+                        currentUser.getRole().getName(),
+                        authorities,
+                        currentUser.getEmail(),
+                        currentUser.getCustomer().getId(),
+                        currentUser.getCustomer().getFirstName(),
+                        currentUser.getCustomer().getLastName(),
+                        currentUser.getCustomer().getAddress()
+                ));
+            } else {
+                return ResponseEntity.ok(new UserResponse(
+                        currentUser.getId(),
+                        currentUser.getUsername(),
+                        currentUser.getRole().getName(),
+                        authorities,
+                        "",
+                        null,
+                        "",
+                        "",
+                        ""
+                ));
+            }
+
+        } catch (Exception ex) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + ex.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -48,7 +48,6 @@ public class UserService {
     }
 
     public List<User> findAll() {
-        // TODO Auto-generated method stub
         return userRepository.findAll();
     }
 

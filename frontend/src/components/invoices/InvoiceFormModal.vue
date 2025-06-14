@@ -126,11 +126,25 @@ const submitInvoice = async () => {
             totalAmount: totalAmount.value,
             description: description.value
         }
+        resetForm()
         emit('saved', res.data);
         props.onClose()
     } catch (err) {
         console.error(err)
         alert('Gagal menyimpan invoice.')
+    }
+
+    const resetForm = () => {
+        invoiceDate.value = null
+        dueDate.value = null
+        transactionAmount.value = 0
+        serviceFeePercentage.value = 0
+        feeAmount.value = 0
+        additionalCosts.value = []
+        subtotal.value = 0
+        taxAmount.value = 0
+        totalAmount.value = 0
+        description.value = ''
     }
 }
 </script>

@@ -9,7 +9,6 @@ public record DeedDocumentsResponse(
         String docType,
         String name,
         String status,
-        String filePath,
         LocalDateTime createdAt,
         LocalDateTime UpdatedAt
         ) {
@@ -20,7 +19,6 @@ public record DeedDocumentsResponse(
                 dd.getDocType(),
                 dd.getName(),
                 dd.getStatus(),
-                dd.getFilePath(),
                 dd.getCreatedAt(),
                 dd.getUpdatedAt()
         );
