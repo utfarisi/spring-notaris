@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class StorageService {
 
-    private final Path root = Paths.get("uploads/invoices");
+    private final Path root = Paths.get("uploads/deeds");
 
     public String save(MultipartFile file) {
         try {
