@@ -11,8 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +36,6 @@ import edu.ut.kelompokb.notaryapp.entities.Customer;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
 import edu.ut.kelompokb.notaryapp.entities.DeedDocument;
 import edu.ut.kelompokb.notaryapp.entities.DeedStatusHistory;
-import edu.ut.kelompokb.notaryapp.entities.User;
 import edu.ut.kelompokb.notaryapp.etc.DeedStatus;
 import edu.ut.kelompokb.notaryapp.exceptions.ResourceNotFoundException;
 import edu.ut.kelompokb.notaryapp.repositories.CustomerRepository;
@@ -50,17 +48,15 @@ import jakarta.validation.ValidationException;
 @Service
 public class DeedService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeedService.class);
-
     private final DeedRepository deedRepo;
     private final CustomerRepository customerRepository;
     private final DeedStatusHistoryRepository statusHistoryRepo;
-    private final UserRepository usrRepo;
     private final DeedDocumentRepository ddRepo;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
 
+    @Autowired
     public DeedService(DeedRepository deedRepo, CustomerRepository customerRepository,
             DeedStatusHistoryRepository statusHistoryRepo,
             UserRepository usrRepo,
@@ -69,7 +65,6 @@ public class DeedService {
         this.deedRepo = deedRepo;
         this.customerRepository = customerRepository;
         this.statusHistoryRepo = statusHistoryRepo;
-        this.usrRepo = usrRepo;
         this.ddRepo = ddRepo;
     }
 
@@ -182,13 +177,13 @@ public class DeedService {
 
     public Page<DeedResponse> findDeedsByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("deedDate").descending());
-        return deedRepo.findDeedsByCustomerId(userId, pageable)
+        return deedRepo.findByCustomerIdWithDetails(userId, pageable)
                 .map(DeedResponse::fromEntity);
     }
 
     public Page<DeedCompleteResponse> findDeedsAndSiblingByUser(Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("deedDate").descending());
-        return deedRepo.findDeedsByCustomerId(userId, pageable)
+        return deedRepo.findByCustomerIdWithDetails(userId, pageable)
                 .map(DeedCompleteResponse::fromEntity);
     }
 
@@ -224,8 +219,6 @@ public class DeedService {
 
     @Transactional
     public DeedDocumentsResponse saveDocument(Long deedId, MultipartFile file, String docType, String username) throws IOException {
-        User user = usrRepo.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Deed deed = deedRepo.findById(deedId)
                 .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan."));
