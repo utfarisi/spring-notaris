@@ -65,7 +65,7 @@ import { useRoute } from 'vue-router'
 import PreviewDocument from '@/components/PreviewDocument.vue';
 import api from '@/libs/utils'
 
-const backendBaseUrl = ref(import.meta.env.VITE_APP_BACKEND_URL || 'http://localhost:8080');
+const backendBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 
 const route = useRoute()
 const deedId = route.params.id
