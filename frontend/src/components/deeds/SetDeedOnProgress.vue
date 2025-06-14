@@ -164,10 +164,10 @@ const submitProcessStatus = async () => {
         const payload = {
             status: 'IN_PROGRESS',
             note: processNoteInput.value || 'Dokumen telah diverifikasi dan akta sedang diproses.',
-            number: deedNumberInput.value
+            numberInvoice: deedNumberInput.value
         };
 
-        const deedRest = await api.put(`/deeds/${props.deed.id}/status`, payload, { withCredentials: true });
+        const deedRest = await api.put(`/deeds/${props.deed.id}/status`, payload);
 
         emit('saved', deedRest.data);
         processSuccess.value = "Akta berhasil diproses dan status diatur IN_PROGRESS.";

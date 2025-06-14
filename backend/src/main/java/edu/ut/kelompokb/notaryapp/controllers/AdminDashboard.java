@@ -1,10 +1,12 @@
 package edu.ut.kelompokb.notaryapp.controllers;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +38,15 @@ public class AdminDashboard {
     }
 
     @RequestMapping("/deeds/processing")
-    public ResponseEntity<Integer> deedProcessing() {
-        return ResponseEntity.ok(deedSrv.countByStatus(DeedStatus.IN_PROGRESS));
+    public ResponseEntity<?> deedProcessing() {
+        try {
+            return ResponseEntity.ok(deedSrv.countByStatus(DeedStatus.IN_PROGRESS));
+        } catch (Exception e) {
+            Map<String, String> errorBody = new HashMap<>();
+            errorBody.put("error", "Internal Server Error");
+            errorBody.put("message", "Terjadi kesalahan yang tidak terduga: " + e.getMessage());
+            return new ResponseEntity<>(errorBody, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

@@ -15,10 +15,10 @@
                 </thead>
                 <tbody>
                     <tr v-for="inv in invoice?.content" :key="inv.id" class="border-t">
-                        <td class="px-4 py-2 text-center border border-gray-300">{{ inv.invoiceNumber }}</td>
+                        <td class="px-4 py-2 text-center border border-gray-300">{{ inv?.invoiceNumber }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ formatDate(inv.invoiceDate) }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">Rp{{ inv.totalAmount.toLocaleString()
-                        }}</td>
+                            }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv.status }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">
                             <router-link class="text-blue-600" :to="`/invoices/${inv.id}`">Lihat</router-link>
