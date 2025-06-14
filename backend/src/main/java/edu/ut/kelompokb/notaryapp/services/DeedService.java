@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -206,7 +205,7 @@ public class DeedService {
     public void updateDeed(DeedEditRequest request) {
 
         Deed deed = deedRepo.findById(request.id()).orElseThrow(() -> new ResourceNotFoundException("Akta dengan ID " + request.id() + " tidak ditemukan."));
-        if (deed.getDeedType() == "Jual Beli") {
+        if ("Jual Beli".equals(deed.getDeedType())) {
             throw new ValidationException("Nomor Akta '" + request.deed_number() + "' sudah ada.");
         }
 
@@ -226,7 +225,7 @@ public class DeedService {
     @Transactional
     public DeedDocumentsResponse saveDocument(Long deedId, MultipartFile file, String docType, String username) throws IOException {
         User user = usrRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Deed deed = deedRepo.findById(deedId)
                 .orElseThrow(() -> new ResourceNotFoundException("Akta tidak ditemukan."));
