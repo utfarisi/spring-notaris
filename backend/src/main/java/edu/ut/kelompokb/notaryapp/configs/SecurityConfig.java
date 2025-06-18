@@ -34,8 +34,25 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/register", "/", "/index.html", "/css/**", "/js/**", "/img/**", "/*.ico", "/*.png", "/swagger-ui/**", "/v3/api/docs/**").permitAll()
-                .requestMatchers("/vite.svg", "/assets/index-Cwgy1Y1I.js", "/assets/**").permitAll()
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/*.js",
+                        "/*.css",
+                        "/*.png", "/*.jpg", "/*.jpeg", "/*.gif",
+                        "/assets/**"
+                ).permitAll()
+                // Izinkan endpoint otentikasi API Anda (misalnya /api/auth/login, /api/auth/register)
+                // Pastikan ini sesuai dengan prefix API autentikasi Anda
+                .requestMatchers("/api/auth/**").permitAll()
+                // Izinkan semua rute frontend SPA, TERMASUK /login, KECUALI prefix API backend Anda
+                // Pastikan untuk memasukkan semua prefix API backend Anda di regex ini
+                .requestMatchers("/{path:^(?!api|admin|another-backend-path$).*$}/**", // Rute umum SPA
+                        "/login", // <--- Tambahkan /login di sini secara eksplisit
+                        "/deeds/**" // <--- Contoh lain jika Anda tidak yakin dengan regex
+                ).permitAll()
+                // Semua request ke /api/ (setelah /api/auth/) memerlukan otentikasi
+                .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
