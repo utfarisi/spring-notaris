@@ -3,11 +3,11 @@ import router from '@/router'
 import { useAuthStore } from '@/stores/authStore'
 
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
-console.log(" env yang keluar ", import.meta.env.VITE_API_BASE_URL)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"; 
+console.log(" env yang keluar ", API_BASE_URL)
+
 const api = axios.create({
-  
-  baseURL: '/api',
+  baseURL: API_BASE_URL+'/api', // <-- Ini benar untuk proxy
   withCredentials: true
 })
 

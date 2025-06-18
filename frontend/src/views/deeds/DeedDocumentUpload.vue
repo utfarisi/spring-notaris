@@ -1,8 +1,8 @@
 <template>
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow p-6 space-y-4">
+    <div class="max-w-3xl p-6 mx-auto space-y-4 bg-white shadow rounded-xl">
         <div class="mb-4">
-            <p class="font-medium text-gray-700 mb-1">Dokumen Wajib:</p>
-            <ul class="list-disc pl-5 text-sm text-gray-600">
+            <p class="mb-1 font-medium text-gray-700">Dokumen Wajib:</p>
+            <ul class="pl-5 text-sm text-gray-600 list-disc">
                 <li v-for="doc in requiredDocs" :key="doc">{{ doc }}</li>
             </ul>
         </div>
@@ -10,7 +10,7 @@
         <form @submit.prevent="handleSubmit" v-if="requiredDocs.length > 0">
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Jenis Dokumen</label>
-                <select v-model="selectedDocType" class="mt-1 block w-full border p-2 rounded">
+                <select v-model="selectedDocType" class="block w-full p-2 mt-1 border rounded">
                     <option disabled value="">-- Pilih Jenis Dokumen --</option>
                     <option v-for="doc in requiredDocs" :key="doc" :value="doc">{{ doc }}</option>
                 </select>
@@ -18,15 +18,15 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Pilih File</label>
-                <input type="file" @change="handleFileChange" class="mt-1 block w-full border p-2 rounded" />
+                <input type="file" @change="handleFileChange" class="block w-full p-2 mt-1 border rounded" />
             </div>
 
             <div class="flex justify-end gap-2 mt-6">
                 <button type="button" @click="onClose"
-                    class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded">
+                    class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
                     Batal
                 </button>
-                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
                     :disabled="!selectedFile || !selectedDocType || uploading">
                     <span v-if="uploading">Mengunggah...</span>
                     <span v-else>Unggah</span>
@@ -34,31 +34,17 @@
             </div>
         </form>
 
-        <p v-else class="text-sm text-green-700 mt-4">
+        <p v-else class="mt-4 text-sm text-green-700">
             Semua dokumen wajib telah diunggah.
         </p>
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import api from '@/libs/utils'
 import { requiredDocumentsMap } from '@/libs/requiredDocuments'
 import { useRoute } from 'vue-router'
-
-// const props = defineProps<{
-//     show: boolean
-//     deed: {
-//         id: number,
-//         deedType: string,
-//         deedDocs: Array<{
-//             docType: string,
-//             status: string,
-//             name: string,
-//         }>
-//     },
-//     onClose: () => void
-// }>()
 
 const route = useRoute()
 
@@ -81,13 +67,13 @@ const requiredDocs = computed(() => {
     return allRequired.filter(doc => !uploadedTypes.includes(doc))
 })
 
-const selectedFile = ref<File | null>(null)
-const selectedDocType = ref<string>('')
+const selectedFile = ref < File | null > (null)
+const selectedDocType = ref < string > ('')
 const uploading = ref(false)
-const documents = ref<any[]>([])
+const documents = ref([])
 
-const handleFileChange = (e: Event) => {
-    const target = e.target as HTMLInputElement
+const handleFileChange = (e) => {
+    const target = e.target
     selectedFile.value = target.files?.[0] || null
 }
 

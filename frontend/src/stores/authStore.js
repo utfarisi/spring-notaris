@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import api from '@/libs/utils'; // Asumsi ini adalah instance Axios Anda
-import router from '@/router'; // Import router Vue Anda jika ingin redirect setelah logout
+import router from '@/router'; 
+import axios from 'axios';// Import router Vue Anda jika ingin redirect setelah logout
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -24,7 +25,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async initialize() {
       try {
-        const res = await api.get('/auth/me'); // Pastikan endpoint ini benar untuk mendapatkan info user
+        const res = await axios.get('/auth/me'); // Pastikan endpoint ini benar untuk mendapatkan info user
         this.user = res.data;
       } catch (error) {
         console.error("Error initializing auth store:", error);

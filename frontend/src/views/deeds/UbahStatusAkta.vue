@@ -1,26 +1,28 @@
 <template>
     <form @submit.prevent="submitStatus" class="space-y-4 bg-white">
-        <select v-model="form.status" class="input w-full border ">
+        <select v-model="form.status" class="w-full border input ">
             <option disabled value="">Pilih Status</option>
             <option v-for="(label, key) in statusOptions" :key="key" :value="key">{{ label }}</option>
         </select>
-        <textarea v-model="form.note" placeholder="Catatan..." class="textarea border rounded-md p-2 w-full" />
-        <button type="submit" class="btn btn-primary bg-blue-800 p-2 rounded-md text-white">Simpan Status</button>
+        <textarea v-model="form.note" placeholder="Catatan..." class="w-full p-2 border rounded-md textarea" />
+        <button type="submit" class="p-2 text-white bg-blue-800 rounded-md btn btn-primary">Simpan Status</button>
     </form>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import api from '@/libs/utils'
 
-const props = defineProps<{ deedId: number }>()
+const props = defineProps(
+    { deedId: number }
+)
 
 const form = ref({
     status: '',
     note: ''
 })
 
-const statusOptions: Record<string, string> = {
+const statusOptions = {
     DRAFT: 'Draft',
     IN_PROGRESS: 'Lagi Diproses',
     WAITING_SIGNATURE: 'Menunggu Tanda Tangan',

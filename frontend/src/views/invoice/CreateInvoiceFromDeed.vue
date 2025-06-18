@@ -52,9 +52,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-// const props = defineProps < {
-//     deedId
-// } >
 
 const route = useRoute()
 const transactionAmount = ref(0)

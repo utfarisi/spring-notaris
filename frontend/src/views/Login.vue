@@ -42,6 +42,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/libs/utils'
+import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
 const username = ref('')
@@ -59,8 +60,6 @@ const handleLogin = async () => {
       password: password.value,
     })
 
-
-    // Fetch user info
     const meRes = await api.get('/auth/me')
     authStore.user = meRes.data
 

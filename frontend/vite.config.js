@@ -1,5 +1,4 @@
-/// <reference types="node" />
-
+// vite.config.js
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
@@ -10,15 +9,5 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'https://spring-notaris-production.up.railway.app',
-        changeOrigin: true,
-        secure:true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
+  }
 })

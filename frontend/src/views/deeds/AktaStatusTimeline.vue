@@ -1,9 +1,9 @@
 <template>
     <div class="space-y-4 ml-65">
-        <div class="w-10/12 bg-white p-6 rounded shadow-md overflow-x-auto">
-            <div v-if="statusList.length === 0" class="text-gray-500 italic">Belum ada riwayat status</div>
+        <div class="w-10/12 p-6 overflow-x-auto bg-white rounded shadow-md">
+            <div v-if="statusList.length === 0" class="italic text-gray-500">Belum ada riwayat status</div>
 
-            <ol class="relative border-s border-gray-200 dark:border-gray-700">
+            <ol class="relative border-gray-200 border-s dark:border-gray-700">
                 <li v-for="status in statusList" :key="status.id" class="mb-10 ms-6">
                     <span
                         class="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
@@ -24,13 +24,13 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import api from '@/libs/utils'
 
-const props = defineProps<{ deedId: number }>()
+const props = defineProps({ deedId: number })
 
-const statusList = ref<any[]>([])
+const statusList = ref([])
 
 
 const fetchStatusHistory = async () => {
@@ -38,7 +38,7 @@ const fetchStatusHistory = async () => {
     statusList.value = res.data
 }
 
-const formatDate = (dateStr: string) => new Date(dateStr).toLocaleString()
+const formatDate = (dateStr) => new Date(dateStr).toLocaleString()
 
 onMounted(fetchStatusHistory)
 </script>
