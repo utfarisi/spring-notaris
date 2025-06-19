@@ -3,6 +3,8 @@ package edu.ut.kelompokb.notaryapp.configs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -12,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import edu.ut.kelompokb.notaryapp.security.CustomUserDetailsService;
@@ -42,18 +45,19 @@ public class SecurityConfig {
                         "/*.png", "/*.jpg", "/*.jpeg", "/*.gif",
                         "/assets/**"
                 ).permitAll()
-                // Izinkan endpoint otentikasi API Anda (misalnya /api/auth/login, /api/auth/register)
-                // Pastikan ini sesuai dengan prefix API autentikasi Anda
                 .requestMatchers("/api/auth/**").permitAll()
-                // Izinkan semua rute frontend SPA, TERMASUK /login, KECUALI prefix API backend Anda
-                // Pastikan untuk memasukkan semua prefix API backend Anda di regex ini
                 .requestMatchers("/{path:^(?!api|admin|another-backend-path$).*$}/**", // Rute umum SPA
-                        "/login", // <--- Tambahkan /login di sini secara eksplisit
-                        "/deeds/**" // <--- Contoh lain jika Anda tidak yakin dengan regex
+                        "/login"
                 ).permitAll()
-                // Semua request ke /api/ (setelah /api/auth/) memerlukan otentikasi
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated())
+                .exceptionHandling((e) -> {
+                    e.authenticationEntryPoint(new HttpStatusEntryPoint(UNAUTHORIZED))
+                            .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                response.setStatus(FORBIDDEN.value()); // tetap 403 jika login tapi akses ditolak
+                                response.getWriter().write("Access Denied");
+                            });
+                })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
