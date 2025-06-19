@@ -14,6 +14,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr v-if="loading">
+                        <td colspan="5">
+                            <div class="py-4 text-center">
+                                <span
+                                    class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+                                <p class="mt-2 text-sm text-gray-500">Memuat semua janji...</p>
+                            </div>
+                        </td>
+                    </tr>
                     <tr v-for="inv in invoice?.content" :key="inv.id" class="border-t">
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv?.invoiceNumber }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ formatDate(inv.invoiceDate) }}</td>
@@ -31,6 +40,7 @@
             </table>
 
             <div class="flex items-center justify-between mt-4" v-if="!invoice?.empty">
+
                 <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="prevPage"
                     :disabled="page === 0">
                     &lt; Prev
@@ -52,10 +62,20 @@ import api from '@/libs/utils'
 const invoice = ref()
 const page = ref(0)
 const selectedInvoice = ref(null)
+const loading = ref(false)
 
 onMounted(async () => {
-    const res = await api.get('/invoices');
-    invoice.value = res.data
+    loading.value = true
+    try {
+        const res = await api.get('/invoices');
+        invoice.value = res.data
+    }
+    catch (e) {
+        alert(" Gagal mengambil invoice! ")
+    }
+    finally {
+        loading.value = false
+    }
 })
 
 const viewDetail = (invoice) => {

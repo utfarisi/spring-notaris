@@ -23,6 +23,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr v-if="loading">
+                        <td colspan="6">
+                            <div class="py-4 text-center">
+                                <span
+                                    class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+                                <p class="mt-2 text-sm text-gray-500">Memuat semua janji...</p>
+                            </div>
+                        </td>
+                    </tr>
                     <tr v-for="(akta, index) in aktas" :key="akta.id">
                         <td class="px-4 py-2 text-center border border-gray-300">{{ page * size + index + 1 }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ akta.number }}</td>
@@ -75,13 +84,23 @@ const size = 10
 const showModal = ref(false);
 const totalPages = ref(1)
 const deedSelected = ref()
+const loading = ref(true)
 
 const fetchDeeds = async () => {
-    const res = await api.get('/deeds', {
-        params: { page: page.value, size },
-    })
-    aktas.value = res.data.content
-    totalPages.value = res.data.totalPages
+    loading.value = true
+    try {
+        const res = await api.get('/deeds', {
+            params: { page: page.value, size },
+        })
+        aktas.value = res.data.content
+        totalPages.value = res.data.totalPages
+    }
+    catch (e) {
+
+    }
+    finally {
+        loading.value = false
+    }
 }
 
 

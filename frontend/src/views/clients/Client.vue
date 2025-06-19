@@ -20,6 +20,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr v-if="loading">
+                        <td colspan="7">
+                            <div v-if="loading" class="py-4 text-center">
+                                <span
+                                    class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+                                <p class="mt-2 text-sm text-gray-500">Memuat semua janji...</p>
+                            </div>
+                        </td>
+                    </tr>
                     <tr v-for="(c, index) in clients" :key="c.id">
                         <td class="px-4 py-2 text-center border border-gray-300">{{ page * size + index + 1 }}</td>
                         <td class="px-4 py-2 border border-gray-300">{{ c.fullname }}</td>
@@ -63,14 +72,22 @@ const page = ref(0)
 const size = 10
 const totalPages = ref(1)
 const data = ref();
+const loading = ref(false)
 
 onMounted(async () => {
-    const res = await api.get('/clients', {
-        params: { page: page.value, size },
-    })
-    data.value = res.data;
-    clients.value = res.data.content;
-    totalPages.value = res.data.totalPages;
+    loading.value = true
+    try {
+        const res = await api.get('/clients', {
+            params: { page: page.value, size },
+        })
+        data.value = res.data;
+        clients.value = res.data.content;
+        totalPages.value = res.data.totalPages;
+    }
+    catch (e) { }
+    finally {
+        loading.value = false
+    }
 })
 
 const prevPage = () => {

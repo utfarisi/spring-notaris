@@ -1,44 +1,43 @@
 <template>
     <div>
         <div class="flex">
-            <h1 class="text-2xl font-bold mb-4 w-4/5">Janji Saya</h1>
+            <h1 class="w-4/5 mb-4 text-2xl font-bold">Janji Saya</h1>
             <div class="text-center">
                 <router-link to="/appointments/create"
-                    class="bg-blue-500 px-2 py-1 rounded-xl text-white font-semibold inline-block">
+                    class="inline-block px-2 py-1 font-semibold text-white bg-blue-500 rounded-xl">
                     <span>Buat Janji Baru</span>
                 </router-link>
             </div>
         </div>
 
-        <div v-if="loading" class="text-center py-4">
+        <div v-if="loading" class="py-4 text-center">
             <span
-                class="animate-spin h-6 w-6 border-4 border-blue-400 border-t-transparent rounded-full inline-block"></span>
-            <p class="text-sm text-gray-500 mt-2">Memuat daftar janji...</p>
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat daftar janji...</p>
         </div>
 
         <div v-else class="mt-5 rounded-xl">
-            <div v-if="appointments.length === 0"
-                class="text-gray-500 p-4  bg-white border border-gray-300 rounded-md ">
+            <div v-if="appointments.length === 0" class="p-4 text-gray-500 bg-white border border-gray-300 rounded-md ">
                 Belum ada
                 janji.
             </div>
 
             <ul v-else class="space-y-4">
-                <li v-for="appt in appointments" :key="appt.id" class="p-4 border rounded shadow-sm bg-white">
-                    <div class="flex justify-between items-center">
+                <li v-for="appt in appointments" :key="appt.id" class="p-4 bg-white border rounded shadow-sm">
+                    <div class="flex items-center justify-between">
                         <div>
                             <p class="font-semibold text-blue-600">{{ formatDate(appt.appointmentDate) }}</p>
                             <p class="text-gray-700">Pukul {{ appt.appointmentTime }} selama {{ appt.durationMinute }}
                                 menit</p>
-                            <p class="text-sm text-gray-500 mt-1 italic" v-if="appt.description">"{{ appt.description
-                                }}"</p>
+                            <p class="mt-1 text-sm italic text-gray-500" v-if="appt.description">"{{ appt.description
+                            }}"</p>
                         </div>
 
                         <div class="text-right">
                             <span :class="badgeClass(appt.status)">{{ appt.status }}</span>
                             <div v-if="appt.status === 'PENDING'" class="mt-2">
                                 <button @click="cancelAppointment(appt.id)"
-                                    class="text-sm text-white hover:underline border border-red-800 px-2 py-1 rounded-sm bg-red-600">
+                                    class="px-2 py-1 text-sm text-white bg-red-600 border border-red-800 rounded-sm hover:underline">
                                     Batalkan
                                 </button>
                             </div>
@@ -81,6 +80,7 @@ const loadAppointments = async () => {
         lastPage.value = res.data.last
     } catch (e) {
         console.error('Gagal memuat janji', e)
+        alert(" Gagal membuat janji")
     } finally {
         loading.value = false
     }

@@ -3,6 +3,12 @@
         <div class="flex items-center gap-3 mb-4">
             <h2 class="w-10/12 text-2xl font-semibold">Detail Akta</h2>
 
+            <div v-if="loading" class="py-4 text-center">
+                <span
+                    class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+                <p class="mt-2 text-sm text-gray-500">Memuat daftar janji...</p>
+            </div>
+
             <router-link v-if="deed?.deedStatus === 'DRAFT' && authStore.isUser"
                 :to="{ name: 'EditAktaForm', params: { id: route.params.id } }"
                 class="px-4 py-2 text-sm text-white bg-blue-400 rounded-md">
@@ -155,6 +161,9 @@ const route = useRoute();
 const deed = ref(null);
 
 const note = ref('');
+
+const loading = ref(true)
+
 const statusSteps = ['DRAFT', 'IN_PROGRESS', 'WAITING_SIGNATURE', 'COMPLETED', 'REJECTED'];
 
 const statusTranslations = {
@@ -177,6 +186,9 @@ const onProgressSaved = async (newDeedData) => {
 };
 
 const fetchDetail = async () => {
+
+    loading.value = true
+
     try {
         const detailRes = await api.get(`/deeds/${route.params.id}/status-history`);
         deed.value = detailRes.data;
@@ -184,6 +196,9 @@ const fetchDetail = async () => {
     } catch (error) {
         console.error('Error fetching deed detail:', error);
         alert('Gagal mengambil detail akta.');
+    }
+    finally {
+        loading.value = false
     }
 };
 

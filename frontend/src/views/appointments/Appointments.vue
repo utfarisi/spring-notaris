@@ -1,35 +1,41 @@
 <template>
     <div>
         <div class="flex">
-            <h1 class="text-2xl font-bold mb-4">Daftar Semua Janji</h1>
+            <h1 class="mb-4 text-2xl font-bold">Daftar Semua Janji</h1>
+        </div>
+
+        <div v-if="loading" class="py-4 text-center">
+            <span
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat semua janji...</p>
         </div>
 
         <div class="space-y-4" v-if="totalElement > 0">
-            <div v-for="appt in appointments" :key="appt.id" class="p-4 border rounded shadow-sm bg-white">
+            <div v-for="appt in appointments" :key="appt.id" class="p-4 bg-white border rounded shadow-sm">
                 <div class="flex justify-between">
                     <div>
                         <p class="text-sm text-gray-500">{{ appt.status }}</p>
                         <p class="text-lg font-semibold">{{ appt.appointmentDate }} • {{
                             appt.appointmentTime.substring(0, 5) }} ({{ appt.durationMinute }} menit)</p>
-                        <p class="text-sm text-gray-600 mt-1">{{ appt.description }}</p>
-                        <p class="text-sm mt-2">👤 {{ appt.customer.firstName }} {{ appt.customer.lastName }} | 📞 {{
+                        <p class="mt-1 text-sm text-gray-600">{{ appt.description }}</p>
+                        <p class="mt-2 text-sm">👤 {{ appt.customer.firstName }} {{ appt.customer.lastName }} | 📞 {{
                             appt.customer.phone }}</p>
                     </div>
 
-                    <div class="space-x-2 self-start">
+                    <div class="self-start space-x-2">
                         <button v-if="appt.status === 'PENDING'" @click="cancelAppointment(appt.id)"
-                            class="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700">
+                            class="px-3 py-1 text-sm text-white bg-red-600 rounded hover:bg-red-700">
                             Batalkan
                         </button>
                         <button v-if="isOperator && appt.status === 'PENDING'" @click="confirmAppointment(appt.id)"
-                            class="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700">
+                            class="px-3 py-1 text-sm text-white bg-green-600 rounded hover:bg-green-700">
                             Konfirmasi
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="bg-white p-2 font-bold text-center " v-else>
+        <div class="p-2 font-bold text-center bg-white " v-else>
             Belum ada janji dengan klien
         </div>
     </div>
@@ -41,14 +47,23 @@ import api from '@/libs/utils'
 
 const appointments = ref([])
 const totalElement = ref(0);
-const isOperator = true // atau ambil dari userStore, tergantung autentikasi kamu
+const isOperator = true
+const loading = ref(false)
 
 const fetchAppointments = async () => {
-    const res = await api.get('/appointments')
-    appointments.value = res.data.content
-    totalElement.value = res.data.totalElements
-    console.log(" res ", res);
-    console.log(res?.totalElements);
+    try {
+        const res = await api.get('/appointments')
+        appointments.value = res.data.content
+        totalElement.value = res.data.totalElements
+        console.log(" res ", res);
+        console.log(res?.totalElements);
+    }
+    catch (e) {
+
+    }
+    finally {
+
+    }
 }
 
 const cancelAppointment = async (id) => {

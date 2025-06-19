@@ -2,12 +2,30 @@
     <div class="max-w-3xl p-6 mx-auto bg-white rounded shadow">
         <h1 class="mb-4 text-xl font-bold">Detail Pembayaran Invoice</h1>
 
+        <div v-if="loading" class="py-4 text-center">
+            <span
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat daftar janji...</p>
+        </div>
 
         <div class="mb-4">
-            <p><strong>Nomor Invoice:</strong> {{ invoice?.invoiceNumber }}</p>
-            <p><strong>Tanggal:</strong> {{ formatDate(invoice?.invoiceDate) }}</p>
-            <p><strong>Klien:</strong> {{ invoice?.customer?.fullname }}</p>
-            <p><strong>Total:</strong> {{ formatCurrency(invoice?.totalAmount) }}</p>
+            <div class="grid grid-cols-[auto_10px_1fr] gap-x-2">
+                <p class="font-semibold text-left">Nomor Invoice</p>
+                <p>:</p>
+                <p>{{ invoice?.invoiceNumber }}</p>
+
+                <p class="font-semibold text-left">Tanggal</p>
+                <p>:</p>
+                <p>{{ formatDate(invoice?.invoiceDate) }}</p>
+
+                <p class="font-semibold text-left">Klien</p>
+                <p>:</p>
+                <p>{{ invoice?.customer?.fullname }}</p>
+
+                <p class="font-semibold text-left">Total</p>
+                <p>:</p>
+                <p>{{ formatCurrency(invoice?.totalAmount) }}</p>
+            </div>
         </div>
 
 
@@ -60,14 +78,25 @@ import api from '@/libs/utils'
 import { useRoute } from 'vue-router'
 import { formatDate } from '@/libs/dateUtils'
 
+
 const backendBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 
 const route = useRoute()
 const invoice = ref({})
+const loading = ref(true)
 
 const fetchInvoice = async () => {
-    const { data } = await api.get(`/invoices/${route.params.id}/show`)
-    invoice.value = data
+    loading.value = true
+    try {
+        const { data } = await api.get(`/invoices/${route.params.id}/show`)
+        invoice.value = data
+    }
+    catch (e) {
+
+    }
+    finally {
+        loading.value = false
+    }
 }
 
 const markAsPaid = async () => {

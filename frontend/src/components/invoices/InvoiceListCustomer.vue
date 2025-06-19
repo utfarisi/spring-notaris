@@ -2,6 +2,12 @@
     <div class="p-6">
         <h1 class="mb-4 text-2xl font-bold">Daftar Invoice</h1>
 
+        <div v-if="loading" class="py-4 text-center">
+            <span
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat daftar pelanggan...</p>
+        </div>
+
         <div v-if="invoices.empty" class="p-4 text-gray-500 bg-white border border-gray-300 rounded-md ">Tidak ada
             invoice.</div>
 
@@ -44,18 +50,22 @@ import InvoicePaymentModal from '@/components/invoices/InvoicePaymentModal.vue'
 import api from '@/libs/utils'
 
 const invoices = ref({ content: [], empty: true });
+const loading = ref(true)
 
 const selectedInvoice = ref(null)
 
 const fetchInvoices = async () => {
     try {
+        loading.value = true
         const response = await api.get('/invoices/my-invoice');
         invoices.value = response.data;
 
         invoices.value.empty = !response.data.content || response.data.content.length === 0;
     } catch (error) {
         console.error("Error fetching invoices:", error);
-
+    }
+    finally {
+        loading.value = false
     }
 }
 
