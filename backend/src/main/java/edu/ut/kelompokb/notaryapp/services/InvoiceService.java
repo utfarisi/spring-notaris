@@ -1,6 +1,7 @@
 package edu.ut.kelompokb.notaryapp.services;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -164,7 +165,21 @@ public class InvoiceService {
         invoice.setAccountHolderName(null);
 
         Invoice invoiceBaru = invoiceRepository.save(invoice);
-        return DeedCompleteResponse.fromEntity(invoiceBaru.getDeed());
+
+        Set<DeedDocumentsResponse> deedDocs = invoice.getDeed().getDocuments()
+                .stream()
+                .map(DeedDocumentsResponse::fromEntity)
+                .collect(Collectors.toSet());
+
+        Set<StatusHistoryRecord> listShr = invoice.getDeed().getStatusHistories()
+                .stream()
+                .map(StatusHistoryRecord::fromEntity)
+                .collect(Collectors.toSet());
+
+        InvoiceWithoutDeedResponse invoiceDto = InvoiceWithoutDeedResponse.fromEntity(invoiceBaru);
+
+        return null;
+        //DeedCompleteResponse.fromEntity(invoiceBaru.getDeed());
     }
 
     @Transactional
@@ -237,10 +252,10 @@ public class InvoiceService {
                 .stream()
                 .map(DeedDocumentsResponse::fromEntity)
                 .collect(Collectors.toSet());
-        List<StatusHistoryRecord> listShr = invoice.getDeed().getStatusHistories()
+        Set<StatusHistoryRecord> listShr = invoice.getDeed().getStatusHistories()
                 .stream()
                 .map(StatusHistoryRecord::fromEntity)
-                .toList();
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         CustomerRecord customer = invoice.getCustomer() == null ? null : CustomerRecord.fromEntity(invoice.getCustomer());
 

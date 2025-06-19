@@ -5,13 +5,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,8 @@ import jakarta.validation.ValidationException;
 @Service
 public class DeedService {
 
+    private Logger log = LoggerFactory.getLogger(DeedService.class);
+
     private final DeedRepository deedRepo;
     private final CustomerRepository customerRepository;
     private final DeedStatusHistoryRepository statusHistoryRepo;
@@ -59,11 +62,11 @@ public class DeedService {
     @Value("${app.upload.dir}")
     private String uploadDir;
 
-    @Autowired
     public DeedService(DeedRepository deedRepo, CustomerRepository customerRepository,
             DeedStatusHistoryRepository statusHistoryRepo,
             UserRepository usrRepo,
             DeedDocumentRepository ddRepo) {
+        log.info(" construktor dari deed service");
 
         this.deedRepo = deedRepo;
         this.customerRepository = customerRepository;
@@ -93,7 +96,33 @@ public class DeedService {
 
     public Page<DeedCompleteResponse> getDeedsAndSibling(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return deedRepo.findAll(pageable).map(DeedCompleteResponse::fromEntity);
+        return deedRepo.findAll(pageable).map(deed -> {
+            // Semua akses ke lazy collections di sini akan aman karena @Transactional
+            Set<DeedDocumentsResponse> deedDocs = deed.getDocuments()
+                    .stream()
+                    .map(DeedDocumentsResponse::fromEntity)
+                    .collect(Collectors.toSet());
+            Set<StatusHistoryRecord> listShr = deed.getStatusHistories()
+                    .stream()
+                    .map(StatusHistoryRecord::fromEntity)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+
+            InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+
+            return new DeedCompleteResponse(
+                    deed.getId(),
+                    deed.getCustomer().getId(),
+                    deed.getNumber(),
+                    deed.getDeedType(),
+                    deed.getTitle(),
+                    deed.getDescription(),
+                    deed.getDeed_status(),
+                    deed.getDeedDate(),
+                    deedDocs,
+                    listShr,
+                    invoice
+            );
+        });
     }
 
     @Transactional
@@ -216,10 +245,10 @@ public class DeedService {
                             .stream()
                             .map(DeedDocumentsResponse::fromEntity)
                             .collect(Collectors.toSet());
-                    List<StatusHistoryRecord> listShr = deed.getStatusHistories()
+                    Set<StatusHistoryRecord> listShr = deed.getStatusHistories()
                             .stream()
                             .map(StatusHistoryRecord::fromEntity)
-                            .toList();
+                            .collect(Collectors.toCollection(LinkedHashSet::new));
 
                     InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
 
@@ -246,14 +275,18 @@ public class DeedService {
                 .stream()
                 .map(DeedDocumentsResponse::fromEntity)
                 .collect(Collectors.toSet());
-        List<StatusHistoryRecord> listShr = deed.getStatusHistories()
+
+        Set<StatusHistoryRecord> listShr = deed.getStatusHistories()
                 .stream()
                 .map(dsh -> {
-                    return new StatusHistoryRecord(dsh.getStatus(), dsh.getUpdatedAt(), dsh.getNote());
+                    return new StatusHistoryRecord(dsh.getId(), dsh.getStatus(), dsh.getUpdatedAt(), dsh.getNote());
                 })
-                .toList();
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        log.info(" jumlah statusHistory : " + deed.getStatusHistories().size());
 
         InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
+
         return new DeedCompleteResponse(
                 deed.getId(),
                 deed.getCustomer().getId(),

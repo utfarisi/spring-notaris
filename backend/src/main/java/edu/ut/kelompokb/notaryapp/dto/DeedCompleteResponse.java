@@ -1,7 +1,7 @@
 package edu.ut.kelompokb.notaryapp.dto;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,7 +21,7 @@ public record DeedCompleteResponse(
         DeedStatus deedStatus,
         LocalDate deedDate,
         Set<DeedDocumentsResponse> deedDocs,
-        List<StatusHistoryRecord> statusHistories,
+        Set<StatusHistoryRecord> statusHistories,
         InvoiceWithoutDeedResponse invoice
         ) {
 
@@ -30,10 +30,10 @@ public record DeedCompleteResponse(
                 .stream()
                 .map(DeedDocumentsResponse::fromEntity)
                 .collect(Collectors.toSet());
-        List<StatusHistoryRecord> listShr = deed.getStatusHistories()
+        Set<StatusHistoryRecord> listShr = deed.getStatusHistories()
                 .stream()
                 .map(StatusHistoryRecord::fromEntity)
-                .toList();
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         InvoiceWithoutDeedResponse invoice = deed.getInvoice() == null ? null : InvoiceWithoutDeedResponse.fromEntity(deed.getInvoice());
 

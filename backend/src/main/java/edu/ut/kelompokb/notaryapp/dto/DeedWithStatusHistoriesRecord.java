@@ -1,7 +1,8 @@
 package edu.ut.kelompokb.notaryapp.dto;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.ut.kelompokb.notaryapp.dto.deeds.StatusHistoryRecord;
 import edu.ut.kelompokb.notaryapp.entities.Deed;
@@ -16,12 +17,13 @@ public record DeedWithStatusHistoriesRecord(
         String description,
         LocalDate deedDate,
         DeedStatus deedStatus,
-        List<StatusHistoryRecord> statusHistories) {
+        Set<StatusHistoryRecord> statusHistories) {
 
     public static DeedWithStatusHistoriesRecord fromDeed(Deed deed) {
-        List<StatusHistoryRecord> histories = deed.getStatusHistories().stream()
-                .map(history -> new StatusHistoryRecord(history.getStatus(), history.getUpdatedAt(), history.getNote()))
-                .toList();
+        Set<StatusHistoryRecord> histories = deed.getStatusHistories().stream()
+                .map(history -> new StatusHistoryRecord(history.getId(), history.getStatus(), history.getUpdatedAt(), history.getNote()))
+                .collect(Collectors.toSet());
+
         return new DeedWithStatusHistoriesRecord(
                 deed.getId(),
                 deed.getCustomer().getId(), // Hanya mengambil ID Customer
