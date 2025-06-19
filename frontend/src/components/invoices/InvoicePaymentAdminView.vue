@@ -9,22 +9,27 @@
         </div>
 
         <div class="mb-4">
-            <div class="grid grid-cols-[auto_10px_1fr] gap-x-2">
-                <p class="font-semibold text-left">Nomor Invoice</p>
-                <p>:</p>
-                <p>{{ invoice?.invoiceNumber }}</p>
-
-                <p class="font-semibold text-left">Tanggal</p>
-                <p>:</p>
-                <p>{{ formatDate(invoice?.invoiceDate) }}</p>
-
-                <p class="font-semibold text-left">Klien</p>
-                <p>:</p>
-                <p>{{ invoice?.customer?.fullname }}</p>
-
-                <p class="font-semibold text-left">Total</p>
-                <p>:</p>
-                <p>{{ formatCurrency(invoice?.totalAmount) }}</p>
+            <div class="flex flex-col">
+                <div class="flex items-start gap-x-2">
+                    <p class="w-2/5 font-semibold text-left">Nomor Invoice</p>
+                    <p>:</p>
+                    <p class="flex-1">{{ invoice?.invoiceNumber }}</p>
+                </div>
+                <div class="flex items-start gap-x-2">
+                    <p class="w-2/5 font-semibold text-left">Tanggal</p>
+                    <p>:</p>
+                    <p class="flex-1">{{ formatDate(invoice?.invoiceDate) }}</p>
+                </div>
+                <div class="flex items-start gap-x-2">
+                    <p class="w-2/5 font-semibold text-left">Klien</p>
+                    <p>:</p>
+                    <p class="flex-1">{{ invoice?.customer?.fullname }}</p>
+                </div>
+                <div class="flex items-start gap-x-2">
+                    <p class="w-2/5 font-semibold text-left">Total</p>
+                    <p>:</p>
+                    <p class="flex-1">{{ formatCurrency(invoice?.totalAmount) }}</p>
+                </div>
             </div>
         </div>
 
