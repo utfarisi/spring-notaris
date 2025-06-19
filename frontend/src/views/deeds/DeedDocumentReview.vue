@@ -100,6 +100,7 @@ const verify = async (docId, status) => {
 
 const previewDocument = (doc) => {
     const fileUrl = `${backendBaseUrl.value}/${doc.name}`
+    console.log(fileUrl);
     previewUrl.value = fileUrl
 }
 
