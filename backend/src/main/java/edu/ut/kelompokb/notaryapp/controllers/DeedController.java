@@ -68,7 +68,7 @@ public class DeedController {
 
     @GetMapping("/my-deed")
     public ResponseEntity<?> indexCustomer(@AuthenticationPrincipal CustomUserDetails user, @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "4") int size) {
 
         Long userId = user.getUser().getCustomer().getId();
         try {
