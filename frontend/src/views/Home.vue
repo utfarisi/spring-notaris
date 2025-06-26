@@ -7,18 +7,8 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
-import AdminDashboard from '../components/AdminDashboard.vue'
-import UserDashboard from '../components/UserDashboard.vue'
-
-const authStore = useAuthStore()
-const router = useRouter()
+import AdminDashboard from '@/components/AdminDashboard.vue'
+import UserDashboard from '@/components/UserDashboard.vue'
 
 const auth = useAuthStore()
-const user = authStore.user
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push({ name: 'Login' })
-}
 </script>

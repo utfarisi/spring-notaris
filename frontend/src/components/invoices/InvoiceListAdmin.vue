@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="mb-4 text-xl font-bold">Daftar Invoice</h1>
+        <h1 class="mb-4 text-2xl font-bold">Daftar Invoice</h1>
 
         <div class="p-6 overflow-x-auto bg-white rounded-md shadow-md ">
             <table class="w-full mt-5 border border-gray-300 table-auto">
@@ -27,7 +27,7 @@
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv?.invoiceNumber }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ formatDate(inv.invoiceDate) }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">Rp{{ inv.totalAmount.toLocaleString()
-                        }}</td>
+                            }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">{{ inv.status }}</td>
                         <td class="px-4 py-2 text-center border border-gray-300">
                             <router-link class="text-blue-600" :to="`/invoices/${inv.id}`">Lihat</router-link>

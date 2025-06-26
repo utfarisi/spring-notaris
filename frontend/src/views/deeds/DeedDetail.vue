@@ -3,11 +3,7 @@
         <div class="flex items-center gap-3 mb-4">
             <h2 class="w-10/12 text-2xl font-semibold">Detail Akta</h2>
 
-            <div v-if="loading" class="py-4 text-center">
-                <span
-                    class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
-                <p class="mt-2 text-sm text-gray-500">Memuat daftar janji...</p>
-            </div>
+
 
             <router-link v-if="deed?.deedStatus === 'DRAFT' && authStore.isUser"
                 :to="{ name: 'EditAktaForm', params: { id: route.params.id } }"
@@ -23,7 +19,13 @@
             </router-link>
         </div>
 
-        <div class="flex gap-8 px-6 py-4 bg-white rounded-lg">
+        <div v-if="loading" class="py-4 text-center">
+            <span
+                class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
+            <p class="mt-2 text-sm text-gray-500">Memuat data ...</p>
+        </div>
+
+        <div class="flex gap-8 px-6 py-4 bg-white rounded-lg" v-else>
             <div class="w-2/3 border-gray-300 border-e-2 ">
                 <div v-if="deed" class="mb-6">
                     <div class="grid grid-cols-[auto_auto_1fr] gap-y-3 gap-x-2">

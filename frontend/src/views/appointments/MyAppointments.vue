@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div class="flex">
-            <h1 class="w-4/5 mb-4 text-2xl font-bold">Janji Saya</h1>
+        <div class="md:flex">
+            <h1 class="mb-4 text-2xl font-bold text-center md:w-4/5 md:text-left">Janji Saya</h1>
             <div class="text-center">
                 <router-link to="/appointments/create"
-                    class="inline-block px-2 py-1 font-semibold text-white bg-blue-500 rounded-xl">
-                    <span>Buat Janji Baru</span>
+                    class="block px-2 py-1 font-semibold text-white bg-blue-500 md:inline-block rounded-xl">
+                    <span class="block">Buat Janji Baru</span>
                 </router-link>
             </div>
         </div>
@@ -23,7 +23,8 @@
             </div>
 
             <ul v-else class="space-y-4">
-                <li v-for="appt in appointments" :key="appt.id" class="p-4 bg-white border rounded shadow-sm">
+                <li v-for="appt in appointments" :key="appt.id"
+                    class="p-4 bg-white border border-gray-300 rounded shadow-sm">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="font-semibold text-blue-600">{{ formatDate(appt.appointmentDate) }}</p>

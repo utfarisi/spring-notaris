@@ -47,6 +47,12 @@
                 </tbody>
             </table>
 
+            <ul>
+                <li>
+                    <div>test</div>
+                </li>
+            </ul>
+
             <!-- Pagination -->
             <div class="flex items-center justify-between mt-4" v-if="!data?.empty">
                 <button class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50" @click="prevPage"

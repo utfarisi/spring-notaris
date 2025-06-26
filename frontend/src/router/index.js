@@ -43,23 +43,25 @@ const routes = [
       {path:'clients/:id/show',name:'clientDetail',meta:{roles:['ADMIN']},component:()=>import('@/views/clients/ClientDetail.vue')},
       {path:'operator/deeds/:id/review-documents',meta:{roles:['ADMIN']}, component:()=>import('@/views/deeds/DeedDocumentReview.vue')},
       {path:'users/deeds/:id/upload-documents',meta:{roles:['USER']}, component:()=>import('@/views/deeds/DeedDocumentUpload.vue')},
-      {path:'deeds',name:'akta',component:Deeds},
+      {path:'deeds',name:'akta',meta:{roles:['ADMIN','USER']},component:Deeds},
       {path:'deeds/create',name:'DeedCreate',component:()=>import('@/views/deeds/DeedForm.vue')},
       {path:'deeds/:id/edit',name:'EditAktaForm',component:()=>import('@/views/deeds/EditDeedForm.vue')},
       {path:'deeds/:id',name:'DeedDetail',component:()=>import('@/views/deeds/DeedDetail.vue')},
       {
         path: '/invoices/:id',
         name: 'InvoiceDetailAdmin',
-        component: () => import('@/components/invoices/InvoicePaymentAdminView.vue') // atau ke `pages/invoice/`
+        component: () => import('@/components/invoices/InvoicePaymentAdminView.vue') 
       },
       {
         path:'/my-invoices',
         name:'InvoiceListCustomer',
+        meta:{roles:['USER']},
         component: ()=>import('@/components/invoices/InvoiceListCustomer.vue')
       },
       {
         path:'/invoices',
         name:'InvoiceListAdmin',
+        meta:{roles:['ADMIN']},
         component: ()=>import('@/components/invoices/InvoiceListAdmin.vue')
       },
       {

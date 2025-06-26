@@ -42,7 +42,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/libs/utils'
-import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
 const username = ref('')

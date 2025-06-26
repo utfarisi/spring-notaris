@@ -67,8 +67,8 @@ const requiredDocs = computed(() => {
     return allRequired.filter(doc => !uploadedTypes.includes(doc))
 })
 
-const selectedFile = ref < File | null > (null)
-const selectedDocType = ref < string > ('')
+const selectedFile = ref(null)
+const selectedDocType = ref('')
 const uploading = ref(false)
 const documents = ref([])
 

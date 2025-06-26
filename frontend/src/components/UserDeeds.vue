@@ -1,11 +1,11 @@
 <template>
     <div>
-        <div class="flex">
-            <h1 class="w-4/5 mb-4 text-2xl font-bold">Daftar Akta Saya</h1>
-            <div class="text-center">
+        <div class="block md:flex">
+            <h1 class="mb-4 text-2xl font-bold text-center md:text-left md:w-4/5">Daftar Akta Saya</h1>
+            <div class="">
                 <router-link to="/deeds/create"
-                    class="inline-block px-2 py-1 font-semibold text-white bg-blue-500 rounded-xl">
-                    <span>Buat Akta Baru</span>
+                    class="block px-2 py-1 font-semibold text-white bg-blue-500 md:inline-block rounded-xl">
+                    <span class="block text-center md:flex ">Buat Akta Baru</span>
                 </router-link>
             </div>
         </div>
@@ -14,13 +14,13 @@
         <div v-if="loading" class="py-4 text-center">
             <span
                 class="inline-block w-6 h-6 border-4 border-blue-400 rounded-full animate-spin border-t-transparent"></span>
-            <p class="mt-2 text-sm text-gray-500">Memuat daftar akta...</p>
+            <p class="mt-2 text-sm text-gray-500">Memuat data ...</p>
         </div>
-        <div v-else-if="deeds.length === 0" class="text-gray-500">Belum ada akta.</div>
+        <div v-else-if="data.empty" class="text-gray-500">Belum ada akta.</div>
 
-        <div v-else class="mt-4 space-y-4 bg-white">
-            <div v-for="deed in deeds" :key="deed.id"
-                class="flex flex-col justify-between gap-2 p-4 border rounded shadow sm:flex-row sm:items-center">
+        <div v-else class="mt-4 space-y-">
+            <div v-for="deed in data.content" :key="deed.id"
+                class="flex flex-col justify-between gap-2 p-4 mb-2 bg-white border border-gray-300 rounded shadow sm:flex-row sm:items-center">
                 <div>
                     <p class="mb-2 text-lg font-semibold">{{ deed.title }}</p>
                     <p class="mb-2 text-sm text-gray-500">
@@ -32,7 +32,7 @@
                     <p class="mb-2 text-sm font-bold text-gray font-xl">
                         Status: <span class="px-2 py-1 text-white bg-green-700 rounded-sm">{{
                             translateStatus(deed.deedStatus)
-                        }}</span>
+                            }}</span>
                     </p>
                 </div>
 
@@ -48,11 +48,22 @@
                     <router-link :to="`/invoices/${deed?.id}`" v-if="deed?.invoice">Lihat Invoice</router-link>
                 </div>
             </div>
+
+            <div class="flex justify-between mt-6">
+                <button :disabled="firstPage" @click="previousPage()"
+                    class="text-blue-600 hover:underline disabled:text-gray-400">
+                    ← Sebelumnya
+                </button>
+                <button :disabled="lastPage" @click="nextPage()"
+                    class="text-blue-600 hover:underline disabled:text-gray-400">
+                    Selanjutnya →
+                </button>
+            </div>
+
             <UploadDokumenModal v-if="selectedDeed !== null" :show="showUploadModal" :deed="selectedDeed"
                 @close="() => { showUploadModal = false; selectedDeed = null }"
                 @document-uploaded="handleDocumentUploaded" />
         </div>
-        <InvoicePreview />
     </div>
 </template>
 
@@ -67,6 +78,13 @@ import { requiredDocumentsMap } from '@/libs/requiredDocuments'
 const showUploadModal = ref(false)
 const selectedDeed = ref(null)
 const router = useRouter();
+const data = ref()
+const page = ref(0)
+const size = 4;
+const lastPage = ref(false)
+const firstPage = ref(false)
+const deeds = ref([])
+const loading = ref(true)
 
 const statusTranslations = {
     'DRAFT': 'DRAFT',
@@ -76,32 +94,59 @@ const statusTranslations = {
     'REJECTED': 'DITOLAK'
 };
 
+const fetchData = async () => {
+    loading.value = true
+    try {
+        const res = await api.get(`/deeds/my-deed?page=${page.value}&size=${size}`)
+        data.value = res.data
+        deeds.value = res.data.content
+        lastPage.value = res.data.last
+        firstPage.value = res.data.first
+        page.value = res.data.number
+    } catch (error) {
+
+        console.error('Gagal memuat akta', error)
+    } finally {
+        loading.value = false
+    }
+}
+
+const nextPage = () => {
+    page.value++
+    fetchData()
+}
+
+const previousPage = () => {
+    page.value--
+    fetchData()
+}
+
 const translateStatus = (status) => {
-    return statusTranslations[status] || status; // Mengembalikan status asli jika tidak ditemukan
+    return statusTranslations[status] || status;
 };
 
 const isAllDocsUploadedAndApproved = (deed) => {
-    // Tambahkan guard clause jika deed atau deed.deedType tidak ada
+
     if (!deed || !deed.deedType) {
         return false;
     }
 
     const allRequired = requiredDocumentsMap[deed.deedType] || [];
-    const uploadedDeedDocs = deed.deedDocs || []; // Menggunakan nama yang lebih jelas
+    const uploadedDeedDocs = deed.deedDocs || [];
 
-    // Jika tidak ada dokumen yang wajib, anggap sudah lengkap
+
     if (allRequired.length === 0) {
         return true;
     }
 
-    // Buat Set dari jenis dokumen yang sudah di-upload dan statusnya bukan 'REJECTED'
+
     const uploadedAndAcceptedDocTypes = new Set(
         uploadedDeedDocs
             .filter(doc => doc.status !== 'REJECTED')
             .map(doc => doc.docType)
     );
 
-    // Cek apakah semua required docs ada di uploadedAndAcceptedDocTypes
+
     return allRequired.every(requiredDoc => uploadedAndAcceptedDocTypes.has(requiredDoc));
 };
 
@@ -114,41 +159,27 @@ const showDetail = async (deed) => {
     await router.push(`deeds/${deed.id}`)
 }
 
-const deeds = ref([])
-const loading = ref(true)
-
-onMounted(async () => {
-    try {
-        const res = await api.get('/deeds/my-deed')
-        deeds.value = res.data.content
-    } catch (error) {
-        console.error('Gagal memuat akta', error)
-    } finally {
-        loading.value = false
-    }
-})
+onMounted(fetchData)
 
 const handleDocumentUploaded = async (deedId) => {
     try {
-        // 1. Fetch data akta yang diunggah secara spesifik
-        const res = await api.get(`/deeds/${deedId}/status-history`); // Asumsi ada endpoint untuk fetch 1 akta
+
+        const res = await api.get(`/deeds/${deedId}/status-history`);
         const updatedDeed = res.data;
 
-        // 2. Temukan indeks akta yang diperbarui dalam array 'deeds'
+
         const index = deeds.value.findIndex(d => d.id === deedId);
 
         if (index !== -1) {
-            // 3. Ganti objek akta lama dengan objek akta yang baru diperbarui
-            // Ini memastikan Vue mendeteksi perubahan dan mere-render komponen
             deeds.value[index] = updatedDeed;
         } else {
-            // Jika tidak ditemukan (kasus jarang), muat ulang semua akta sebagai fallback
+
             console.warn(`Akta dengan ID ${deedId} tidak ditemukan di array. Memuat ulang semua akta.`);
             await fetchDeeds();
         }
     } catch (error) {
         console.error('Gagal memperbarui akta setelah unggah dokumen:', error);
-        // Jika ada masalah saat memperbarui satu akta, fallback ke memuat ulang semua
+
         await fetchDeeds();
     }
 };
