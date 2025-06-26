@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async initialize() {
       try {
-        const res = await axios.get('/auth/me'); // Pastikan endpoint ini benar untuk mendapatkan info user
+        const res = await api.get('/auth/me'); // Pastikan endpoint ini benar untuk mendapatkan info user
         this.user = res.data;
       } catch (error) {
         console.error("Error initializing auth store:", error);
@@ -38,7 +38,17 @@ export const useAuthStore = defineStore('auth', {
         
         await api.post('/auth/logout'); 
         
-        this.user = null;
+        this.user = { 
+          id: 0, 
+          username: '', 
+          role: '', 
+          authorities: [], 
+          email: '', 
+          customerId: null, 
+          firstname: '', 
+          lastname: '', 
+          address: ''
+        };
 
         if (router) {
           router.push('/login'); // Ganti dengan path halaman login Anda
